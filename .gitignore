@@ -1,0 +1,8 @@
+glass_liquid_sloshing_simulink/cleanup-*
+glass_liquid_sloshing_simulink/fluent-*
+glass_liquid_sloshing_simulink/libudf
+glass_liquid_sloshing_simulink/log
+rlKinova_marsRover_fluent_via_files/data/work_dir
+rlKinova_marsRover_fluent_via_files/logs
+rlKinova_marsRover_fluent_via_files/savedSims
+.idea/

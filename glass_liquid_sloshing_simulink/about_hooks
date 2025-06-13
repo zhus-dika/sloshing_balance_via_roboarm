@@ -1,0 +1,14 @@
+time-step n
+ ├─ итерация 1
+ │   ├─ DEFINE_ADJUST (если есть)
+ │   ├─ … расчёт потоков …
+ │   ├─ Dynamic-Mesh Update →  DEFINE_CG_MOTION
+ │   └─ DEFINE_EXECUTE_AT_END (если есть)
+ ├─ итерация 2
+ │   ├─ DEFINE_ADJUST
+ │   ├─ …                                   
+ │   ├─ Dynamic-Mesh Update →  DEFINE_CG_MOTION
+ │   └─ EXECUTE_AT_END
+ └─ …
+time-step n+1 → …
+
