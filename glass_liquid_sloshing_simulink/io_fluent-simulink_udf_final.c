@@ -2,10 +2,10 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <time.h>
-#include "sg.h"          /* даёт C_ADAPT_CELL и многое другое */
+#include "sg.h"
+#include <stdbool.h> 
 #include <math.h>        /* fmax() */
 #include <stdio.h>
-#include "sg.h"      /* C_CENTROID, C_VOLUME, C_R …  */
 #include "mem.h"     /* PRF_GRSUM1 */
 
 
@@ -21,21 +21,20 @@
 #define FLAG_OUT "/home/dika/Documents/sloshing_balance_via_roboarm/rlKinova_marsRover_fluent_via_files/data/work_dir/feed.ok"
 #define FEED_OUT "/home/dika/Documents/sloshing_balance_via_roboarm/rlKinova_marsRover_fluent_via_files/data/work_dir/feed.dat"
 
-#define DYNA_ZONE_ID 1
-#define OUTLET_ZONE_ID  6     /* ID переливной грани */
+#define ZONE_VESSEL_LIQ  15
+#define WATER_PHASE_IDX   1      /* индекс water-фазы (см. Phases) */
+/* порог VOF, чтобы ячейку считать «водой» */
+#define VOF_THR  0.5
 #define M_VESSEL 0.35                /* масса, кг          */
 
 #define MAX_RETRY 100     /* макс. число попыток (100 × 1 сек = 100 сек) */
 #define WAIT_US 1000000     /* 1 с ожидания между попытками */
 
-/* глобальный указатель, чтобы потом использовать в других UDF */
-static Dynamic_Thread *dt_vessel = NULL;
-
 /* --- глобальные буферы: актуальная поза —> CG_MOTION --- */
 real cx = 0, cy = 0, cz = 0, q[4] = {1, 0, 0, 0}, velocity[3] = {0, 0, 0}, omega[3] = {0, 0, 0};
 /* --- статическая «память» прошлого кадра --- */
 real t_prev = 0.0;
-
+static real pose[13];
 const real vessel_offset[3] = {0.0, 0.0, 0.0};
 
 int pose_ready = 0;    /* 1 = в буфере лежит свежий кадр */
@@ -63,154 +62,170 @@ static void quat_rotate(const real q[4], const real v[3], real out[3])
 
 DEFINE_CG_MOTION(cup_ext, dt, vel, om, time, dtime)
 {
-    DT_CG(dt)[0] = cx;  DT_CG(dt)[1] = cy;  DT_CG(dt)[2] = cz;
-    DT_Q(dt)[0]  = q[0]; DT_Q(dt)[1] = q[1]; DT_Q(dt)[2] = q[2]; DT_Q(dt)[3] = q[3];
+    DT_CG(dt)[0] = cx;   DT_CG(dt)[1] = cy;   DT_CG(dt)[2] = cz;
+
+    DT_Q(dt)[0]  = q[0]; DT_Q(dt)[1]  = q[1];
+    DT_Q(dt)[2]  = q[2]; DT_Q(dt)[3]  = q[3];
+
     NV_V(vel, =, velocity);
     NV_V(om,  =, omega);
+
+    if (I_AM_NODE_ZERO_P)
+        Message("CG_MOTION t=%.4g  cx=%.4g\n", time, cx);
+    /* никаких return;  хук должен отработать в КАЖДОМ процессе */
 }
 
 DEFINE_ADJUST(read_pose_from_simulink, domain)
 {
-	//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	//if (!I_AM_NODE_ZERO_P) return;
-	
 	real time = CURRENT_TIME;
 	if (fabs(time - t_prev) < 1e-12)  return;
-	
 	t_prev = time;
-	
-	const real phase     = TWO_PI*FREQ*time;
-	const real dphase_dt = TWO_PI*FREQ; 
-	real q_loc[4], vel_loc[3], omega_loc[3]; 
-	real cx_loc, cy_loc, cz_loc;
-	real x_pos = AMP_X * sin(phase);
-	real y_pos = AMP_Y * sin(phase);
 
-	real ang_z = ROT_AMP * sin(phase);
+	/* -------- Node-0 читает файл pose.dat (или пишет демо-синус) -------- */
+	if (I_AM_NODE_ZERO_P)
+	{
+		/* пример: «демка» синусом (как у тебя) */
+		const real phase = TWO_PI*FREQ*time;
+		pose[0] = AMP_X * sin(phase);                 /* cx */
+		pose[1] = AMP_Y * sin(phase);                 /* cy */
+		pose[2] = 0.0;                                /* cz */
+		pose[3] = cos(0.5*ROT_AMP*sin(phase));        /* q0 */
+		pose[4] = 0.0;                                /* q1 */
+		pose[5] = 0.0;                                /* q2 */
+		pose[6] = sin(0.5*ROT_AMP*sin(phase));        /* q3 */
+		pose[7] = AMP_X*TWO_PI*FREQ*cos(phase);       /* vx */
+		pose[8] = AMP_Y*TWO_PI*FREQ*cos(phase);       /* vy */
+		pose[9] = 0.0;                                /* vz */
+		pose[10]= 0.0; pose[11]=0.0;
+		pose[12]= ROT_AMP*TWO_PI*FREQ*cos(phase);     /* ωz */
 
-	q_loc[0] = cos(0.5*ang_z);
-	q_loc[1] = 0.0;
-	q_loc[2] = 0.0;
-	q_loc[3] = sin(0.5*ang_z);
+		FILE *fp = fopen(POSE_IN, "w");
 
-
-	cx_loc = x_pos;
-	cy_loc = y_pos;
-	cz_loc = 0.0;
-	
-	vel_loc[0] = AMP_X * dphase_dt * cos(phase);
-	vel_loc[1] = AMP_Y * dphase_dt * cos(phase);
-	vel_loc[2] = 0.0;
-
-	omega_loc[0] = 0.0;
-	omega_loc[1] = 0.0;
-	omega_loc[2] = ROT_AMP * dphase_dt * cos(phase);
-	FILE *fp = fopen(POSE_IN,"w");
-	if (!I_AM_NODE_ZERO_P) {
 		if (fp) {
 			fprintf(fp,"%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
-			    cx_loc, cy_loc, cz_loc, q_loc[0], q_loc[1], q_loc[2], q_loc[3], vel_loc[0], vel_loc[1], vel_loc[2], omega_loc[0], omega_loc[1], omega_loc[2]);
+			    pose[0], pose[1], pose[2], pose[3], pose[4], pose[5], pose[6], pose[7], pose[8], pose[9], pose[10], pose[11], pose[12]);
 			Message("⚠️ POSE_IN is fully filled  (t = %.6e s)\n", time);
 			fclose(fp);  
 			FILE *ff = fopen(FLAG_IN, "w");
 			if (ff) fclose(ff);
 		}
-	}
-	//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	
-	int retry = 0;
-	while (!flag_exists(FLAG_IN) && retry < MAX_RETRY) {
-		usleep(WAIT_US);
-		retry++;
-	}
-	
-	if (flag_exists(FLAG_IN)) {
-		if (!I_AM_NODE_ZERO_P) Message("⚠️ FLAG_IN found\n");
-		FILE *fp = fopen(POSE_IN,"r");
-		if (fp) {
-			if (fscanf(fp,"%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf", &cx,&cy,&cz,&q[0],&q[1],&q[2],&q[3],&velocity[0],&velocity[1],&velocity[2],&omega[0],&omega[1],&omega[2]) == 13) {
-				if (!I_AM_NODE_ZERO_P) Message("⚠️ CG data are read\n");
+		//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 
+		int retry = 0;
+		while (!flag_exists(FLAG_IN) && retry < MAX_RETRY) {
+			usleep(WAIT_US);
+			retry++;
+		}
+
+		if (flag_exists(FLAG_IN)) {
+			Message("⚠️ FLAG_IN found\n");
+			FILE *fp = fopen(POSE_IN, "r");
+			if (fp) {
+				if (fscanf(fp, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf", 
+				&pose[0], &pose[1], &pose[2], &pose[3], &pose[4], &pose[5], &pose[6], &pose[7], &pose[8], &pose[9], &pose[10], &pose[11], &pose[12]) == 13) {
+					Message("⚠️ CG data are read\n");
+
+				}
 			}
 		}
 	}
+	/* -------- 2.  Рассылаем всем ранкам -------- */
+	PRF_BCAST_REAL(pose, 13, 0);
+
+	/* -------- 3.  Копируем в глобальные переменные -------- */
+	cx = pose[0];  cy = pose[1];  cz = pose[2];
+	memcpy(q,        &pose[3], 4*sizeof(real));
+	memcpy(velocity, &pose[7], 3*sizeof(real));
+	memcpy(omega,    &pose[10],3*sizeof(real));
+
 }
 
-
-
-DEFINE_EXECUTE_AT_END(write_com_system)
+/* -------------------------------------------------------------- */
+DEFINE_EXECUTE_AT_END(write_com_system_spill)
 {
-    /* ---------- 1) масса и момент жидкости ---------- */
-    Domain *d = Get_Domain(1);
-    Thread *t; cell_t c;
+	Domain *d = Get_Domain(1);
+	Thread *t;  cell_t c;
 
-    real m_fluid = 0.0;
-    real M_r[3] = {0};
+	real m_fluid = 0.0;          /* масса воды            */
+	real M_r[3] = {0.0,0.0,0.0}; /* ∑ m · x               */
+	real vol_spill = 0.0;        /* объём разлива         */
 
-    thread_loop_c(t, d)
-    {
-        if (FLUID_THREAD_P(t))
-        {
-            begin_c_loop_all(c, t)
-            {
-                real vol  = C_VOLUME(c,t);
-                real rho  = C_R(c,t);        /* плотность ячейки */
-                real mass = rho * vol;
+	/* --- проходим все fluid-треды -------------------------------- */
+	thread_loop_c(t, d)
+	{
+		if (!FLUID_THREAD_P(t)) continue;
 
-                real xc[ND_ND];
-                C_CENTROID(xc,c,t);
+		Thread *t_water = THREAD_SUB_THREAD(t, WATER_PHASE_IDX);
+		if (!t_water) continue;               /* в зоне нет water */
 
-                m_fluid  += mass;
-                M_r[0]   += mass * xc[0];
-                M_r[1]   += mass * xc[1];
-                M_r[2]   += mass * xc[2];
-            }
-            end_c_loop_all(c, t)
-        }
-    }
-    /* глобальные редукции – ВСЕ ранки должны дойти до этой точки */
-    m_fluid  = PRF_GRSUM1(m_fluid);
-    M_r[0]   = PRF_GRSUM1(M_r[0]);
-    M_r[1]   = PRF_GRSUM1(M_r[1]);
-    M_r[2]   = PRF_GRSUM1(M_r[2]);
+		const int inside = (THREAD_ID(t) == ZONE_VESSEL_LIQ);
 
-    /* после редукций «лишние» ранки можем отпустить */
-    if(!I_AM_NODE_ZERO_P) return;
+		begin_c_loop_all(c, t)
+		{
+			real vf = C_VOF(c, t_water);      /* <-- только water-тред */
+			//if (vf > 0.0 && THREAD_ID(t)!=ZONE_VESSEL_LIQ)
+				//Message("rank %d, cell %ld, vf = %.3e, vol = %.3e\n", myid, c, vf, C_VOLUME(c,t));
 
-    /* ---------- 2) COM жидкости ---------- */
-    real com_fluid[3] = {0};
-    if (m_fluid > 0) {
-        com_fluid[0] = M_r[0]/m_fluid;
-        com_fluid[1] = M_r[1]/m_fluid;
-        com_fluid[2] = M_r[2]/m_fluid;
-    }
+			if (vf < VOF_THR) continue;
 
-    /* ---------- 3) COM пустого сосуда ---------- */
-    real offset_world[3];
-    quat_rotate(q, vessel_offset, offset_world);
+			real vol  = C_VOLUME(c, t);       /* объём ячейки */
+			real rho  = C_R(c, t_water);      /* плотность water*vf */
+			real mass = rho * vol;
 
-    real com_vessel[3] = { cx + offset_world[0],
-                           cy + offset_world[1],
-                           cz + offset_world[2] };
+			real xc[ND_ND]; C_CENTROID(xc,c,t);
 
-    /* ---------- 4) общий COM системы ---------- */
-    const real EPS = 1e-12;
-    real m_total = M_VESSEL + m_fluid;
-    if (m_total < EPS) return;      /* защита от деления на 0 */
+			m_fluid  += mass;
+			M_r[0]   += mass*xc[0];
+			M_r[1]   += mass*xc[1];
+			M_r[2]   += mass*xc[2];
 
-    real com_total[3] = {
-        (M_VESSEL*com_vessel[0] + m_fluid*com_fluid[0]) / m_total,
-        (M_VESSEL*com_vessel[1] + m_fluid*com_fluid[1]) / m_total,
-        (M_VESSEL*com_vessel[2] + m_fluid*com_fluid[2]) / m_total
-    };
+			if (!inside)
+				vol_spill += vf * vol;        /* пролив */
+		}
+		end_c_loop_all(c,t)
+	}
 
-    /* ---------- 5) вывод для Simulink ---------- */
-    FILE *fp = fopen("/path/to/feed.dat","w");
-    if(fp){
-        fprintf(fp, "%.6e %.6e %.6e %.6e\n",
-                CURRENT_TIME, com_total[0], com_total[1], com_total[2]);
-        fclose(fp);
-        FILE *flag = fopen("/path/to/feed.ok","w"); if(flag) fclose(flag);
-    }
+	/* --- MPI-редукции ------------------------------------------- */
+	m_fluid   = PRF_GRSUM1(m_fluid);
+	M_r[0]    = PRF_GRSUM1(M_r[0]);
+	M_r[1]    = PRF_GRSUM1(M_r[1]);
+	M_r[2]    = PRF_GRSUM1(M_r[2]);
+	vol_spill = PRF_GRSUM1(vol_spill);
+
+	/* --- файл пишет только node-0 ------------------------------- */
+	if (!I_AM_NODE_ZERO_P) return;
+
+	/* COM жидкости */
+	real com_f[3] = {0};
+	if (m_fluid > 0.0) {
+		com_f[0] = M_r[0]/m_fluid;
+		com_f[1] = M_r[1]/m_fluid;
+		com_f[2] = M_r[2]/m_fluid;
+	}
+
+	/* COM пустого сосуда */
+	real off_w[3];  quat_rotate(q, vessel_offset, off_w);
+	real com_v[3] = { cx+off_w[0], cy+off_w[1], cz+off_w[2] };
+
+	/* COM системы «сосуд+жидкость» */
+	const real m_tot = M_VESSEL + m_fluid;
+	if (m_tot <= 1e-9) return;          /* защита */
+
+	real com_tot[3] = {
+		(M_VESSEL*com_v[0] + m_fluid*com_f[0]) / m_tot,
+		(M_VESSEL*com_v[1] + m_fluid*com_f[1]) / m_tot,
+		(M_VESSEL*com_v[2] + m_fluid*com_f[2]) / m_tot
+	};
+
+	/* --- вывод -------------------------------------------------- */
+	FILE *fp = fopen(FEED_OUT,"w");
+	if (fp) {
+		fprintf(fp,"%.6e %.6e %.6e %.6e %.6e\n",
+			CURRENT_TIME, com_tot[0], com_tot[1], com_tot[2],
+			vol_spill);
+	fclose(fp);
+	FILE *flag = fopen(FLAG_OUT,"w"); if(flag) fclose(flag);
+	Message("✅ feed.dat written (t = %.4e, vol_spill = %.4e))\n", CURRENT_TIME, vol_spill);
+	}
 }
 

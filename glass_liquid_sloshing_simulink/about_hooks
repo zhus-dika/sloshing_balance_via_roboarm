@@ -12,3 +12,7 @@ time-step n
  └─ …
 time-step n+1 → …
 
+rm -f cleanup-fluent-*.sh fluent-*.trn fluent-*.log 
+
+1.800000e-01 1.071700e-02 2.679000e-03 0.000000e+00 0.000000e+00
+
