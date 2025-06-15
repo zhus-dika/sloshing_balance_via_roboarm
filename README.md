@@ -19,5 +19,8 @@
     ```
 - Read case file [glass_liquid_sloshing_simulink/FFF_last.cas.h5](glass_liquid_sloshing_simulink/FFF_last.cas.h5)
 - Set the number of MPI processes, for example, for 4 cores is 4
-- Load udf file [glass_liquid_sloshing_simulink/io_fluent-simulink_udf_final.c](glass_liquid_sloshing_simulink/io_fluent-simulink_udf_final.c)
+- Build & load udf file [glass_liquid_sloshing_simulink/io_fluent-simulink_udf_final.c](glass_liquid_sloshing_simulink/io_fluent-simulink_udf_final.c)
 - Activate function hooks
+- Read a scheme via GUI *File → Read → Scheme* [glass_liquid_sloshing_simulink/reset/reset_flag.scm](glass_liquid_sloshing_simulink/reset/reset_flag.scm)
+- Add cmd ```(reset-if-flag)``` in Execute Commands via GUI *Solution → Calculation Activities → Execute Commands*
+  Details: Active — ✔︎, Execution Type → Execute Repeatedly, Every = 1
