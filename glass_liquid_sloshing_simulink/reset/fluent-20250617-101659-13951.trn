@@ -1,0 +1,220 @@
+Auto-Transcript Start Time:  10:16:59, 17 Jun 2025 
+Current Directory: "/home/dika/Documents/sloshing_balance_via_roboarm/glass_liquid_sloshing_simulink/reset"
+/home/dika/Documents/ansys_inc/v251/fluent/fluent25.1.0/bin/fluent -r25.1.0 3ddp -pdefault -host -alnamd64 -t4 -mpi=intel -path/home/dika/Documents/ansys_inc/v251/fluent -ssh -cx dika-ROG-Strix-G814JV-G814JV:40483:43133
+Starting /home/dika/Documents/ansys_inc/v251/fluent/fluent25.1.0/lnamd64/3ddp_host/fluent.25.1.0 host -cx dika-ROG-Strix-G814JV-G814JV:40483:43133 "(list (rpsetvar (QUOTE parallel/function) "fluent 3ddp -flux -node -alnamd64 -r25.1.0 -t4 -pdefault -mpi=intel -ssh") (rpsetvar (QUOTE parallel/rhost) "") (rpsetvar (QUOTE parallel/ruser) "") (rpsetvar (QUOTE parallel/nprocs_string) "4") (rpsetvar (QUOTE parallel/auto-spawn?) #t) (rpsetvar (QUOTE parallel/trace-level) 0) (rpsetvar (QUOTE parallel/remote-shell) 1) (rpsetvar (QUOTE parallel/path) "/home/dika/Documents/ansys_inc/v251/fluent") (rpsetvar (QUOTE parallel/hostsfile) "") (rpsetvar (QUOTE gpuapp/devices) ""))"
+
+              Welcome to ANSYS Fluent 2025 R1
+
+              Copyright 1987-2025 ANSYS, Inc. All Rights Reserved.
+              Unauthorized use, distribution or duplication is prohibited.
+              This product is subject to U.S. laws governing export and re-export.
+              For full Legal Notice, see documentation.
+
+Build Time: Nov 26 2024 15:35:45 EST  Build Id: 10210  
+ 
+Connected License Server List:	1055@localhost
+Host spawning Node 0 on machine "dika-ROG-Strix-G814JV-G814JV" (unix).
+/home/dika/Documents/ansys_inc/v251/fluent/fluent25.1.0/bin/fluent -r25.1.0 3ddp -flux -node -alnamd64 -t4 -pdefault -mpi=intel -ssh -mport 127.0.1.1:127.0.1.1:44861:0
+Starting /home/dika/Documents/ansys_inc/v251/fluent/fluent25.1.0/multiport/mpi/lnamd64/intel2021/bin/mpirun -f /tmp/fluent-appfile.dika.14546 -genv I_MPI_FABRICS shm -genv FLUENT_ARCH lnamd64 -genv I_MPI_DEBUG 0 -genv I_MPI_ADJUST_GATHERV 3 -genv I_MPI_ADJUST_ALLREDUCE 2 -genv I_MPI_PLATFORM auto -genv PYTHONHOME /home/dika/Documents/ansys_inc/v251/fluent/fluent25.1.0/../../commonfiles/CPython/3_10/linx64/Release/python -genv FLUENT_PROD_DIR /home/dika/Documents/ansys_inc/v251/fluent/fluent25.1.0 -genv FLUENT_AFFINITY 0 -genv I_MPI_PIN enable -genv KMP_AFFINITY disabled -n 4 /home/dika/Documents/ansys_inc/v251/fluent/fluent25.1.0/lnamd64/3ddp_node/fluent_mpi.25.1.0 node -mpiw intel -pic shmem -mport 127.0.1.1:127.0.1.1:44861:0
+
+------------------------------------------------------------------------------------------------
+ID    Hostname              Core  O.S.      PID          Vendor                                
+------------------------------------------------------------------------------------------------
+n0-3  dika-ROG-Strix-G814J  4/14  Linux-64  14619-14622  13th Gen Intel(R) Core(TM) i7-13650HX 
+host  dika-ROG-Strix-G814J        Linux-64  14190        13th Gen Intel(R) Core(TM) i7-13650HX 
+
+MPI Option Selected: intel
+Selected system interconnect: shared-memory
+------------------------------------------------------------------------------------------------
+
+Cleanup script file is /home/dika/Documents/sloshing_balance_via_roboarm/glass_liquid_sloshing_simulink/reset/cleanup-fluent-dika-ROG-Strix-G814JV-G814JV-14190.sh
+
+Graphics driver currently in use: opengl2
+
+
+Posting ANSYS Product Improvement Program startup data
+Done.
+Fast-loading "/home/dika/Documents/ansys_inc/v251/fluent/fluent25.1.0/addons/afd/lib/hdfio.bin"
+Done.
+WARNING: Rank:0 Machine dika-ROG-Strix-G814JV-G814JV has 34 % of RAM filled with file buffer caches.
+This can cause potential performance issues. Please use -cflush flag to flush the cache. 
+
+
+Reading from dika-ROG-Strix-G814JV-G814JV:"/home/dika/Documents/sloshing_balance_via_roboarm/glass_liquid_sloshing_simulink/reset/initial.cas.h5" in NODE0 mode ...
+  Reading mesh ...
+        1134 cells,     2 cell zones ...
+            126 hexahedral cells,  zone id: 3
+           1008 hexahedral cells,  zone id: 15
+        3690 faces,     6 face zones ...
+             36 quadrilateral wall faces,  zone id: 1
+            414 quadrilateral wall faces,  zone id: 5
+            234 quadrilateral interior faces,  zone id: 2
+           2754 quadrilateral interior faces,  zone id: 12
+            126 quadrilateral interior faces,  zone id: 9
+            126 quadrilateral pressure-outlet faces,  zone id: 6
+        1450 nodes,     1 node zone  ...
+  Done.
+
+
+Checking the existence of compiled "libudf" UDF library for current platform.
+If needed will attempt auto-compilation...
+
+ 	 Make sure that UDF source files are in the directory 
+ 	 that contains your case and data files. If you have 
+ 	 an existing libudf directory, please remove this 
+ 	 directory to ensure that latest files are used. 
+  
+
+Will now auto-compile UDF library "libudf".
+Copy "/home/dika/Documents/sloshing_balance_via_roboarm/glass_liquid_sloshing_simulink/io_fluent-simulink_udf_final.c" to "libudf/src"
+
+Files udf_names.c and user.udf in 3ddp_host are up-to-date.
+Files udf_names.c and user.udf in 3ddp_node are up-to-date.
+
+Working...
+# linking to ../../src/io_fluent-simulink_udf.c in lnamd64/3ddp_host
+# linking to ../../src/io_fluent-simulink_udf_final.c in lnamd64/3ddp_host
+# building library in lnamd64/3ddp_host
+
+# linking to ../../src/io_fluent-simulink_udf.c in lnamd64/3ddp_node
+# linking to ../../src/io_fluent-simulink_udf_final.c in lnamd64/3ddp_node
+# building library in lnamd64/3ddp_node
+
+
+You can also see the 'log'-file in 
+the working directory for this compilation history
+
+Done.
+
+dika-ROG-Strix-G814JV-G814JV: Opening library "/home/dika/Documents/sloshing_balance_via_roboarm/glass_liquid_sloshing_simulink/libudf"...
+Done.
+
+dika-ROG-Strix-G814JV-G814JV: Opening library "/home/dika/Documents/sloshing_balance_via_roboarm/glass_liquid_sloshing_simulink/libudf"...
+	cup_ext
+	read_pose_from_simulink
+	write_props_to_simulink
+Done.
+
+Building...
+     mesh
+	distributing mesh
+		parts....,
+		faces....,
+		nodes....,
+		cells....,
+        bandwidth reduction using Reverse Cuthill-McKee: 229/39 = 5.87179
+     materials,
+     interface,
+     domains,
+	mixture
+	air
+	water
+	interaction
+     zones,
+	air-domain  (water)
+	air-domain  (air)
+	wall-solid-air  (water)
+	wall-solid-air  (air)
+	interior-solid  (water)
+	interior-solid  (air)
+	water-domain  (air)
+	water-domain  (water)
+	interior-solid:012  (air)
+	interior-solid:012  (water)
+	interior-solid:009  (air)
+	interior-solid:009  (water)
+	wall-solid-water  (air)
+	wall-solid-water  (water)
+	top_outer_wall  (air)
+	top_outer_wall  (water)
+	interior-solid
+	wall-solid-air
+	interior-solid:012
+	interior-solid:009
+	wall-solid-water
+	top_outer_wall
+	air-domain
+	water-domain
+     parallel,
+     dynamic zones,
+        wall-solid-water
+        wall-solid-air
+        top_outer_wall
+Done.
+
+Reading from dika-ROG-Strix-G814JV-G814JV:"/home/dika/Documents/sloshing_balance_via_roboarm/glass_liquid_sloshing_simulink/reset/initial.dat.h5" in NODE0 mode ...
+
+
+  Reading results.
+Parallel variables...
+Done.
+
+> (cx-gui-do cx-activate-item "Ribbon*Frame1*Frame4(User-Defined)*Table1*Table3(User Defined)*PushButton1(Functions)")
+(cx-gui-do cx-activate-item "MenuBar*PopupMenuFunctions*Compiled...")
+(cx-gui-do cx-activate-item "Compiled UDFs*Table1*Frame1*Frame2*PushButton1( Add)")
+(cx-gui-do cx-set-file-dialog-entries "Select File" '( "/home/dika/Documents/sloshing_balance_via_roboarm/glass_liquid_sloshing_simulink/io_fluent-simulink_udf_final.c") "Source Files (*.c *.cpp )")
+(cx-gui-do cx-set-list-selections "Compiled UDFs*Table1*Frame1*List1(Source Files)" '( 0))
+(cx-gui-do cx-activate-item "Compiled UDFs*Table1*Frame1*List1(Source Files)")
+(cx-gui-do cx-activate-item "Compiled UDFs*Frame10*PushButton2(Build)")
+(cx-gui-do cx-activate-item "Question*OK")
+Copy "/home/dika/Documents/sloshing_balance_via_roboarm/glass_liquid_sloshing_simulink/io_fluent-simulink_udf_final.c" to "libudf/src"
+
+Files udf_names.c and user.udf in 3ddp_host are up-to-date.
+Files udf_names.c and user.udf in 3ddp_node are up-to-date.
+
+Working...
+# linking to ../../src/io_fluent-simulink_udf.c in lnamd64/3ddp_host
+# linking to ../../src/io_fluent-simulink_udf_final.c in lnamd64/3ddp_host
+# building library in lnamd64/3ddp_host
+
+# linking to ../../src/io_fluent-simulink_udf.c in lnamd64/3ddp_node
+# linking to ../../src/io_fluent-simulink_udf_final.c in lnamd64/3ddp_node
+# building library in lnamd64/3ddp_node
+
+
+You can also see the 'log'-file in 
+the working directory for this compilation history
+
+dika-ROG-Strix-G814JV-G814JV: Opening library "/home/dika/Documents/sloshing_balance_via_roboarm/glass_liquid_sloshing_simulink/libudf"...
+Done.
+
+dika-ROG-Strix-G814JV-G814JV: Opening library "/home/dika/Documents/sloshing_balance_via_roboarm/glass_liquid_sloshing_simulink/libudf"...
+	cup_ext
+	read_pose_from_simulink
+	write_props_to_simulink
+Done.
+
+Done.
+(cx-gui-do cx-activate-item "Compiled UDFs*PanelButtons*PushButton1(OK)")
+
+dika-ROG-Strix-G814JV-G814JV: Opening library "/home/dika/Documents/sloshing_balance_via_roboarm/glass_liquid_sloshing_simulink/libudf"...
+Done.
+
+dika-ROG-Strix-G814JV-G814JV: Opening library "/home/dika/Documents/sloshing_balance_via_roboarm/glass_liquid_sloshing_simulink/libudf"...
+	cup_ext
+	read_pose_from_simulink
+	write_props_to_simulink
+Done.
+(cx-gui-do cx-activate-item "Ribbon*Frame1*Frame4(User-Defined)*Table1*Table3(User Defined)*PushButton3(Function Hooks)")
+(cx-gui-do cx-activate-item "User-Defined Function Hooks*PanelButtons*PushButton1(OK)")
+(cx-gui-do cx-activate-item "MenuBar*WriteSubMenu*Case & Data...")
+(cx-gui-do cx-set-file-dialog-entries "Select File" '( "/home/dika/Documents/sloshing_balance_via_roboarm/glass_liquid_sloshing_simulink/reset/initial.cas.h5") "CFF Case/Data Files (*.cas.h5 *.dat.h5 )")
+(cx-gui-do cx-activate-item "Question*OK")
+
+Writing to dika-ROG-Strix-G814JV-G814JV:"/home/dika/Documents/sloshing_balance_via_roboarm/glass_liquid_sloshing_simulink/reset/initial.cas.h5" in NODE0 mode and compression level 1 ...
+Grouping cells for Laplace smoothing ...
+        1134 cells,     2 zones ...
+        3690 faces,     6 zones ...
+        1450 nodes,     1 zone  ...
+  Done.
+Done.
+
+Writing to dika-ROG-Strix-G814JV-G814JV:"/home/dika/Documents/sloshing_balance_via_roboarm/glass_liquid_sloshing_simulink/reset/initial.dat.h5" in NODE0 mode and compression level 1 ...
+  Writing results.
+Done.
+/exit y
+
+Posting ANSYS Product Improvement Program performance data 
+Done.
+Auto-Transcript Stop Time:  10:18:20, 17 Jun 2025 
+Total Transcript Time: 1 Minute 20 Second.

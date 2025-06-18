@@ -3,42 +3,9 @@
 
 % Copyright 2021-2022, The MathWorks, Inc.
 
-%% -------- BALL PARAMETERS --------
-
-% Target positon
-target_pos_x = 0;
-target_pos_y = 0;
-
-% Physical parameters
-ball.radius = 0.02;     % m
-ball.mass   = 0.0027;   % kg
-ball.shell  = 0.0002;   % m
-
-% Calculate ball moment of inertia
-ball.moi = calcMOI(ball.radius,ball.shell,ball.mass);
-
-% Initial conditions. +z is vertically downward
-ball.x0  = 0*0.07;       % m, ball initial x distance from center of plate
-ball.y0  = 0*0.04;       % m, ball initial height from the top surface of plate
-ball.z0  = ball.radius;       % m, ball initial z distance from center of plate
-
-ball.dx0 = 0;       % m/s, ball initial x speed from center of plate
-ball.dy0 = 0;       % m/s, ball initial height from the top surface of plate
-ball.dz0 = 0;       % m/s, ball initial x distance from center of plate
-
-% Contact friction parameters
-ball.staticfriction     = 0.5;
-ball.dynamicfriction    = 0.3;     % Simscape Multibody default
-ball.criticalvelocity   = 1e-3;    % Simscape Multibody default, m/s
-
-% convert coefficient of restitution to spring-damper parameters
-coeff_restitution = 0.89;
-[k, c, w] = cor2SpringDamperParams(coeff_restitution,ball.mass);
-ball.stiffness = k;
-ball.damping = c;
-ball.transitionwidth = w;
-
-clear r1 r2 I e dT
+%% -------- VESSEL PARAMETERS --------
+vessel.mass = 0.35;
+vessel.height = 0.200;
 
 %% -------- KINOVA ARM PARAMETERS --------
 
@@ -71,18 +38,18 @@ m3 = 0.137977;       % масса локтя
 m4 = 0.4;
 
 g = 9.80665;
-m_eff_shoulder = m2 + m3 + m4 + ball.mass;
+m_eff_shoulder = m2 + m3 + m4 + vessel.mass;
 d_eff_shoulder = 0.2;
 shoulder_torque_0 = m_eff_shoulder * g * d_eff_shoulder * cos(R2_q0);
 
 % shoulder_torque_0 = m2 * g * d2 * cos(R2_q0);    
 
-m_eff_elbow = m4 + ball.mass;   % всё, что висит на локте
+m_eff_elbow = m4 + vessel.mass;   % всё, что висит на локте
 d_eff_elbow = 0.12;         % расстояние от локтя до центра масс платформы
 elbow_torque_0 = m_eff_elbow * g * d_eff_elbow * cos(R2_q0 + R3_q0);
 
-wrist_torque_0 = (-1.882 + ball.x0 * ball.mass * g) * cos(deg2rad(-65) - R6_q0);
-hand_torque_0 = (0.0002349 - ball.y0 * ball.mass * g) * cos(deg2rad(-90) - R7_q0);
+wrist_torque_0 = (-1.882 + vessel.mass * g) * cos(deg2rad(-65) - R6_q0);
+hand_torque_0 = (0.0002349 - vessel.mass * g) * cos(deg2rad(-90) - R7_q0);
 U0 = [shoulder_torque_0 elbow_torque_0 wrist_torque_0 hand_torque_0];
 
 %% -------- GLASS PLATE PARAMETERS --------
