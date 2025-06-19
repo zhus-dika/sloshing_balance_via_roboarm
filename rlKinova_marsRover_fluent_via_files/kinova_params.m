@@ -4,8 +4,8 @@
 % Copyright 2021-2022, The MathWorks, Inc.
 
 %% -------- VESSEL PARAMETERS --------
-vessel.mass = 0.35;
-vessel.height = 0.200;
+vessel.mass = 0.035;
+vessel.height = 0.100;
 
 %% -------- KINOVA ARM PARAMETERS --------
 
