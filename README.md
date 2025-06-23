@@ -17,7 +17,7 @@
     ```
     __NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia fluent
     ```
-- Read case file [glass_liquid_sloshing_simulink/FFF_last.cas.h5](glass_liquid_sloshing_simulink/FFF_last.cas.h5)
+- Read case file [glass_liquid_sloshing_simulink/setup_vessel_3.5x6.0x100_res-4.cas.h5](glass_liquid_sloshing_simulink/setup_vessel_3.5x6.0x100_res-4.cas.h5)
 - Set the number of MPI processes, for example, for 4 cores is 4
 - Build & load udf file [glass_liquid_sloshing_simulink/io_fluent-simulink_udf_final.c](glass_liquid_sloshing_simulink/io_fluent-simulink_udf_final.c)
 - Activate function hooks
