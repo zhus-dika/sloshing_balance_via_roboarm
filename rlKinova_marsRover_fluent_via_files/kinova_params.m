@@ -6,6 +6,9 @@
 %% -------- VESSEL PARAMETERS --------
 vessel.mass = 0.035;
 vessel.height = 0.100;
+vessel.radius_top = 0.06;
+vessel.radius_bot = 0.035;
+vessel.fill = 0.077;
 
 %% -------- KINOVA ARM PARAMETERS --------
 
@@ -58,6 +61,9 @@ plate.length = 0.25;     % m, radius of plate
 plate.width  = 0.25;     % m, radius of plate
 plate.thickness = 0.005;                    % m, thicknes of plate
 plate.mass = 0.2;                        % m, mass of plate
+
+plate.linear_vel_limit = 3;
+plate.angle_vel_limit = 10;
 
 w = plate.width;
 h = plate.length;

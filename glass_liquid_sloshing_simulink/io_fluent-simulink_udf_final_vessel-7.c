@@ -33,7 +33,7 @@
 #define RESET_FLAG "/home/dika/Documents/sloshing_balance_via_roboarm/glass_liquid_sloshing_simulink/reset/reset.ok"
 
 /* ---------- геометрия и материал --------------------------------- */
-#define ZONE_VESSEL_LIQ  9     /* id зоны внутри сосуда */
+#define ZONE_VESSEL_LIQ  17     /* id зоны внутри сосуда */
 #define WATER_PHASE_IDX   1     /* «water» в списке фаз   */
 #define VOF_THR        0.50     /* min VOF для учёта      */
 #define RHO_W       1000.0      /* плотность воды, кг/м³  */
@@ -76,7 +76,6 @@ static void quat_rotate(const real Q[4], const real v[3], real out[3])
 DEFINE_CG_MOTION(cup_ext, dt, vel, omega, time, dtime)
 {
     DT_CG(dt)[0] = CX; DT_CG(dt)[1] = CY; DT_CG(dt)[2] = CZ;
-    real norm = sqrt(Q[0]*Q[0] + Q[1]*Q[1] + Q[2]*Q[2] + Q[3]*Q[3]);
     
     DT_Q(dt)[0]  = Q[1]; DT_Q(dt)[1]  = Q[2]; DT_Q(dt)[2] = Q[3]; DT_Q(dt)[3] = Q[0];
 
