@@ -7,6 +7,11 @@
 - Open project file `rlKinovaBallBalance.prj`
 - For 3d visualisation, change `Visualisation` option from `None` to `3D Mesh`
 - Run `TrainSACAgentForBallBalanceControlExample.mlx` script
+
+
+  **Main physical scheme**
+![alt text](https://github.com/zhus-dika/sloshing_balance_via_roboarm/blob/main/rlKinova_marsRover_fluent_via_files/images/main_scheme.png)
+
 ### 🐌 FLUENT
 - Run ansys server in bash
     ```
@@ -24,3 +29,7 @@
 - Read a scheme via GUI *File → Read → Scheme* [glass_liquid_sloshing_simulink/reset/reset_flag.scm](glass_liquid_sloshing_simulink/reset/reset_flag.scm)
 - Add cmd ```(reset-if-flag)``` in Execute Commands via GUI *Solution → Calculation Activities → Execute Commands*
   Details: Active — ✔︎, Execution Type → Execute Repeatedly, Every = 1
+
+### Animation 🦏
+
+![Alt Text](https://github.com/zhus-dika/sloshing_balance_via_roboarm/blob/main/rlKinova_marsRover_fluent_via_files/data/output/kinovaBallBalanceAgent_with_mars_rover_act2_act3_v3/ansys-simulink_vessel-roboarm-animation_16x.gif)
