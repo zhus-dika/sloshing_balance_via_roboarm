@@ -1,3 +1,8 @@
+## 🐠 Software
+
+- Matlab R2024a
+- Ansys 2025R1
+
 ## 🦋 Used models from the Mathworks Team
 
 - Train Kinova RoboArm https://www.mathworks.com/help/reinforcement-learning/ug/train-sac-agent-for-ball-balance-control.html
@@ -30,6 +35,6 @@
 - Add cmd ```(reset-if-flag)``` in Execute Commands via GUI *Solution → Calculation Activities → Execute Commands*
   Details: Active — ✔︎, Execution Type → Execute Repeatedly, Every = 1
 
-### Animation 🦏
+### 🦏 Animation 
 
 ![Alt Text](https://github.com/zhus-dika/sloshing_balance_via_roboarm/blob/main/rlKinova_marsRover_fluent_via_files/data/output/kinovaBallBalanceAgent_with_mars_rover_act2_act3_v3/ansys-simulink_vessel-roboarm-animation_16x.gif)
