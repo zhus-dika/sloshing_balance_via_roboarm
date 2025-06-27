@@ -30,7 +30,7 @@
 #define POSE_IN   "/home/dika/Documents/sloshing_balance_via_roboarm/rlKinova_marsRover_fluent_via_files/data/work_dir/pose.dat"
 #define FLAG_OUT  "/home/dika/Documents/sloshing_balance_via_roboarm/rlKinova_marsRover_fluent_via_files/data/work_dir/feed.ok"
 #define FEED_OUT  "/home/dika/Documents/sloshing_balance_via_roboarm/rlKinova_marsRover_fluent_via_files/data/work_dir/feed.dat"
-#define RESET_FLAG "/home/dika/Documents/sloshing_balance_via_roboarm/glass_liquid_sloshing_simulink/reset/reset.ok"
+#define RESET_FLAG "/home/dika/Documents/sloshing_balance_via_roboarm/glass_liquid_sloshing_simulink/vessel-res-7/reset/reset.ok"
 
 /* ---------- геометрия и материал --------------------------------- */
 #define ZONE_VESSEL_LIQ  17     /* id зоны внутри сосуда */
@@ -234,12 +234,20 @@ DEFINE_EXECUTE_AT_END(write_props_to_simulink)
         Message("Warning: cannot open %s for writing\n", FEED_OUT);
     }
 
-    /* ---------- обработка reset.ok -------------------------------- */
-    if (access(RESET_FLAG, F_OK) == 0) {
-        if (remove(RESET_FLAG) == 0)
-            Message("reset.ok processed → model reload requested.\n");
-        else
-            Message("Warning: can't remove reset.ok (errno = %d)\n", errno);
-    }
+	/* ---------- обработка reset.ok -------------------------------- */
+	if (access(RESET_FLAG, F_OK) == 0) {
+
+	    /*  1. снимаем флаг перезапуска  */
+	    if (remove(RESET_FLAG) == 0)
+		Message("reset.ok processed → model reload requested.\n");
+	    else
+		Message("Warning: can't remove reset.ok (errno = %d)\n", errno);
+
+	    /*  2. удаляем старые файлы обмена, чтобы новый эпизод
+		   начинался с чистого листа                            */
+	    remove(FLAG_OUT);      /* feed.ok */
+	    remove(FEED_OUT);      /* feed.dat */
+	    Message("old feed.dat/ok cleared after reset.\n");
+	}
 }
 

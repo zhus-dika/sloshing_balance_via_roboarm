@@ -1,0 +1,6 @@
+# linking to ../../src/io_fluent-simulink_udf_final_vessel-res-7.c in lnamd64/3ddp_host
+# building library in lnamd64/3ddp_host
+
+# linking to ../../src/io_fluent-simulink_udf_final_vessel-res-7.c in lnamd64/3ddp_node
+# building library in lnamd64/3ddp_node
+
