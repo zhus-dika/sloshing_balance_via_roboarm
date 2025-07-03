@@ -1,0 +1,10 @@
+Delete animations:
+
+//solve/animate/objects> delete
+
+Object name> animation-1
+
+
+/file/read-case-data "/home/dika/Documents/sloshing_balance_via_roboarm/glass_liquid_sloshing_simulink/vessel-res-7/setup_vessel_3.5x6.0x100_res-7.cas.h5"
+
+(load "/home/dika/Documents/sloshing_balance_via_roboarm/glass_liquid_sloshing_simulink/vessel-res-7/reset/reset_flag_vessel-res-7.scm")

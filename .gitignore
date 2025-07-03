@@ -6,3 +6,4 @@ rlKinova_marsRover_fluent_via_files/data/work_dir
 rlKinova_marsRover_fluent_via_files/logs
 rlKinova_marsRover_fluent_via_files/savedSims
 .idea/
+rlKinova_marsRover_fluent_via_files/trained_agents/checkpoints

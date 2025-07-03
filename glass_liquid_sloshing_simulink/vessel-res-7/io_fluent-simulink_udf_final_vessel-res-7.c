@@ -22,8 +22,8 @@
 #define TWO_PI (2.0*M_PI)
 
 /* ---------- ожидание входного флага pose.ok ---------------------- */
-#define MAX_ATTEMPTS 100          /* сколько раз подряд ждать файл-флаг */
-#define WAIT_US      1000000      /* задержка между попытками, мкс ≈1 с */
+#define MAX_ATTEMPTS 1000          /* сколько раз подряд ждать файл-флаг */
+#define WAIT_US      100000      /* задержка между попытками, мкс ≈0.1 с */
 
 /* ---------- файлы обмена ----------------------------------------- */
 #define FLAG_IN   "/home/dika/Documents/sloshing_balance_via_roboarm/rlKinova_marsRover_fluent_via_files/data/work_dir/pose.ok"
@@ -234,20 +234,11 @@ DEFINE_EXECUTE_AT_END(write_props_to_simulink)
         Message("Warning: cannot open %s for writing\n", FEED_OUT);
     }
 
-	/* ---------- обработка reset.ok -------------------------------- */
-	if (access(RESET_FLAG, F_OK) == 0) {
-
-	    /*  1. снимаем флаг перезапуска  */
-	    if (remove(RESET_FLAG) == 0)
-		Message("reset.ok processed → model reload requested.\n");
-	    else
-		Message("Warning: can't remove reset.ok (errno = %d)\n", errno);
-
-	    /*  2. удаляем старые файлы обмена, чтобы новый эпизод
-		   начинался с чистого листа                            */
-	    remove(FLAG_OUT);      /* feed.ok */
-	    remove(FEED_OUT);      /* feed.dat */
-	    Message("old feed.dat/ok cleared after reset.\n");
-	}
+    /* ---------- обработка reset.ok -------------------------------- */
+    if (access(RESET_FLAG, F_OK) == 0) {
+        if (remove(RESET_FLAG) == 0)
+            Message("reset.ok processed → model reload requested.\n");
+        else
+            Message("Warning: can't remove reset.ok (errno = %d)\n", errno);
+    }
 }
-

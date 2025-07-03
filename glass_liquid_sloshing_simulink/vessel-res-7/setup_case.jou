@@ -1,0 +1,32 @@
+/file/set-batch-options no yes yes no
+
+/file/read-case-data "/home/dika/Documents/sloshing_balance_via_roboarm/glass_liquid_sloshing_simulink/vessel-res-7/setup_vessel_3.5x6.0x100_res-7.cas.h5"
+
+; ------ libudf -----------------------------------------------------------
+;/define/user-defined/compiled/build "libudf" ""
+/define/user-defined/compiled/load  "libudf"
+
+; ------ включаем unsteady (пример для pressure-based) --------------------
+/define/models/solver/pressure-based/unsteady-1st-order?        ; ← первая строка
+
+/solve/set/transient-controls/time-step-size ;
+
+/solve/set/transient-controls/max-iterations-per-time-step   30
+/solve/set/transient-controls/number-of-time-steps           100000
+
+; ------ Scheme -----------------------------------------------------------
+(load "/home/dika/Documents/sloshing_balance_via_roboarm/glass_liquid_sloshing_simulink/vessel-res-7/reset/reset_flag_vessel-res-7.scm")
+
+;(cx-execute-at-end reset-if-flag)          ; ← одна строка, ошибок больше не будет
+
+; ------ никаких авто-стопов ---------------------------------------------
+/solve/monitors/residual/stop-at-convergence?     no
+/solve/monitors/residual/check-convergence? no
+
+; ------ запускаем --------------------------------------------------------
+/solve/iterate 100000
+
+;/file/write-data "/.../out/data_100k.h5"
+/exit yes
+
+

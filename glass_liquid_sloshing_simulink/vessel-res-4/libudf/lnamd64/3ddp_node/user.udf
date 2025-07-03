@@ -1,0 +1,4 @@
+CSOURCES= io_fluent-simulink_udf_fina_vessel-res-4.c
+HSOURCES=
+FLUENT_INC=/home/dika/Documents/ansys_inc/v251/fluent
+GPU_SUPPORT=off

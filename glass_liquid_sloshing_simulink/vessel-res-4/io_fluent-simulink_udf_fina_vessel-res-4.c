@@ -14,16 +14,10 @@
 #include <string.h>   /* memcpy */
 #include <errno.h>    /* errno  */
 
-/* ---------- демо-параметры движения (если нет pose.dat) ---------- */
-#define AMP_X   0.02
-#define AMP_Z   0.005
-#define ROT_AMP 0.10
-#define FREQ    0.5
-#define TWO_PI (2.0*M_PI)
-
 /* ---------- ожидание входного флага pose.ok ---------------------- */
-#define MAX_ATTEMPTS 100          /* сколько раз подряд ждать файл-флаг */
-#define WAIT_US      1000000      /* задержка между попытками, мкс ≈1 с */
+#define SKIP     20          /* 20 шагов  × 0.0005 = 0.01 c */
+#define MAX_ATTEMPTS 100         /* сколько раз подряд ждать файл-флаг */
+#define WAIT_US      1000000      /* задержка между попытками, мкс ≈ 1 с */
 
 /* ---------- файлы обмена ----------------------------------------- */
 #define FLAG_IN   "/home/dika/Documents/sloshing_balance_via_roboarm/rlKinova_marsRover_fluent_via_files/data/work_dir/pose.ok"
@@ -42,6 +36,9 @@
 #define I_VES_X  1.2e-3
 #define I_VES_Y  1.2e-3
 #define I_VES_Z  2.3e-3
+
+static int step_cnt = 0;        /* счётчик CFD-шагов */
+static int step_cnt_out = 0;          /* счётчик для feed.dat */
 /* смещение КС сосуда (если STL-центр не совпал) */
 static const real vessel_offset[3] = {0.0, 0.0, 0.0};
 
@@ -70,34 +67,75 @@ static void quat_rotate(const real Q[4], const real v[3], real out[3])
     out[1] = v[1] + s*t[1] + (z*t[0] - x*t[2]);
     out[2] = v[2] + s*t[2] + (x*t[1] - y*t[0]);
 }
-
-DEFINE_INIT(clear_feed_on_init, domain)
+/* ---------- полезные утилиты ----------------------------------- */
+static void quat_mul(const real a[4], const real b[4], real out[4])
 {
-    if (I_AM_NODE_ZERO_P) {
-        remove(FEED_OUT);
-        remove(FLAG_OUT);
-    }
+    out[0] = a[0]*b[0] - a[1]*b[1] - a[2]*b[2] - a[3]*b[3];
+    out[1] = a[0]*b[1] + a[1]*b[0] + a[2]*b[3] - a[3]*b[2];
+    out[2] = a[0]*b[2] - a[1]*b[3] + a[2]*b[0] + a[3]*b[1];
+    out[3] = a[0]*b[3] + a[1]*b[2] - a[2]*b[1] + a[3]*b[0];
+}
+static void quat_normalize(real q[4])
+{
+    real n = sqrt(q[0]*q[0]+q[1]*q[1]+q[2]*q[2]+q[3]*q[3]);
+    if (n>0) for(int i=0;i<4;++i) q[i] /= n;
+}
+
+/* ---------- 1. при каждом CFD-шаге задаём движение сосуда ------ */
+DEFINE_CG_MOTION(cup_ext, dt, vel, omega, time, dtime)
+{
+    /* --- интегрируем линейное перемещение ---------------------- */
+    CX += VELOCITY[0]*dtime;
+    CY += VELOCITY[1]*dtime;
+    CZ += VELOCITY[2]*dtime;
+
+    /* --- интегрируем ориентацию кватернионом ------------------- */
+    /* инкрементальный кватернион от угл. скорости */
+    real dq[4] = {1.0,
+                  0.5*OMEGA[0]*dtime,
+                  0.5*OMEGA[1]*dtime,
+                  0.5*OMEGA[2]*dtime};
+    real qnew[4];
+    quat_mul(dq, Q, qnew);      /* dq ∘ Q  */
+    //quat_normalize(qnew);
+    memcpy(Q, qnew, 4*sizeof(real));
+
+    /* --- отдаём Fluent позу и скорости ------------------------- */
+    DT_CG(dt)[0]=CX;  DT_CG(dt)[1]=CY;  DT_CG(dt)[2]=CZ;
+    DT_Q(dt)[0]=Q[1]; DT_Q(dt)[1]=Q[2]; DT_Q(dt)[2]=Q[3]; DT_Q(dt)[3]=Q[0];
+
+    NV_V(vel  , =, VELOCITY);
+    NV_V(omega, =, OMEGA);
 }
 /*------------------------------------------------------------------*/
 /* 1. 6-DOF движение чашки */
+/*
+DEFINE_CG_MOTION(cup_ext, dt, vel, omega, time, dtime)
+{
+    NV_V(vel  , =, VELOCITY);
+    NV_V(omega, =, OMEGA);
+}
 DEFINE_CG_MOTION(cup_ext, dt, vel, omega, time, dtime)
 {
     DT_CG(dt)[0] = CX; DT_CG(dt)[1] = CY; DT_CG(dt)[2] = CZ;
-    real norm = sqrt(Q[0]*Q[0] + Q[1]*Q[1] + Q[2]*Q[2] + Q[3]*Q[3]);
     
     DT_Q(dt)[0]  = Q[1]; DT_Q(dt)[1]  = Q[2]; DT_Q(dt)[2] = Q[3]; DT_Q(dt)[3] = Q[0];
 
     NV_V(vel  , =, VELOCITY);
     NV_V(omega, =, OMEGA);
 }
-
+*/
 /* 2. Считываем pose.dat (или ждём) */
 DEFINE_ADJUST(read_pose_from_simulink, domain)
 {
     real t = CURRENT_TIME;
     if (fabs(t - t_prev) < 1e-12) return;  /* уже отработали на этом шаге */
     t_prev = t;
+    
+    if (++step_cnt % SKIP != 0)    /* 20 × 0.0005 с = 0.01 с */
+        return;
 
+    step_cnt = 0;                /* обнулили, чтобы не переполнять */
     if (I_AM_NODE_ZERO_P) {
 
         /* несколько попыток увидеть pose.ok */
@@ -143,6 +181,19 @@ DEFINE_ADJUST(read_pose_from_simulink, domain)
 /* 3. В конце шага вычисляем свойства жидкости и пишем feed.dat */
 DEFINE_EXECUTE_AT_END(write_props_to_simulink)
 {
+    if (I_AM_NODE_ZERO_P){
+         /* ---------- обработка reset.ok -------------------------------- */
+        if (access(RESET_FLAG, F_OK) == 0) {
+            if (remove(RESET_FLAG) == 0)
+                Message("reset.ok processed → model reload requested.\n");
+            else
+                Message("Warning: can't remove reset.ok (errno = %d)\n", errno);
+        }
+    }
+    if (++step_cnt_out % SKIP != 0)     /* 20 × 0.0005 = 0.01 c */
+        return;                       /* пропускаем 19 шагов */
+
+    step_cnt_out = 0;                 /* сбросили счётчик */
     Domain *d = Get_Domain(1);
     Thread *t; cell_t c;
 
@@ -242,12 +293,4 @@ DEFINE_EXECUTE_AT_END(write_props_to_simulink)
         Message("Warning: cannot open %s for writing\n", FEED_OUT);
     }
 
-    /* ---------- обработка reset.ok -------------------------------- */
-    if (access(RESET_FLAG, F_OK) == 0) {
-        if (remove(RESET_FLAG) == 0)
-            Message("reset.ok processed → model reload requested.\n");
-        else
-            Message("Warning: can't remove reset.ok (errno = %d)\n", errno);
-    }
 }
-
