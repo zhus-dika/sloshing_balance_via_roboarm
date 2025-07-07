@@ -36,5 +36,7 @@
   Details: Active — ✔︎, Execution Type → Execute Repeatedly, Every = 1
 
 ### 🦏 Animation 
+with iso-surface
+  
+![Alt Text](https://github.com/zhus-dika/sloshing_balance_via_roboarm/blob/main/rlKinova_marsRover_fluent_via_files/data/output/kinovaBallBalanceAgent_with_mars_rover_act2_act3_act6_act7/ansys-isosurface%2Brl-kinova_16x.gif)
 
-![Alt Text](https://github.com/zhus-dika/sloshing_balance_via_roboarm/blob/main/rlKinova_marsRover_fluent_via_files/data/output/kinovaBallBalanceAgent_with_mars_rover_act2_act3_v3/ansys-simulink_vessel-roboarm-animation_16x.gif)
