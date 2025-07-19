@@ -3,6 +3,14 @@ glass_liquid_sloshing_simulink/fluent-*
 glass_liquid_sloshing_simulink/libudf
 glass_liquid_sloshing_simulink/log
 
+glass_liquid_sloshing_simulink/vessel-res-2/cleanup-*
+glass_liquid_sloshing_simulink/vessel-res-2/fluent*
+glass_liquid_sloshing_simulink/vessel-res-2/libudf
+
+glass_liquid_sloshing_simulink/vessel-res-3/cleanup-*
+glass_liquid_sloshing_simulink/vessel-res-3/fluent*
+glass_liquid_sloshing_simulink/vessel-res-3/libudf
+
 glass_liquid_sloshing_simulink/vessel-res-4/cleanup-*
 glass_liquid_sloshing_simulink/vessel-res-4/fluent*
 glass_liquid_sloshing_simulink/vessel-res-4/libudf

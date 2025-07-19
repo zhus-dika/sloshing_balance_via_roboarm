@@ -20,3 +20,10 @@ fluent 3ddp -g -t4 -i /home/dika/Documents/sloshing_balance_via_roboarm/glass_li
 #running without GUI
 
 fluent 3ddp -g -t4
+
+# RAM и swap
+watch -n5 free -h
+# если всё-таки нужна GPU для Fluent
+watch -n5 nvidia-smi
+# диск
+watch -n30 'df -h /home'
