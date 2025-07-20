@@ -40,3 +40,13 @@ with iso-surface
   
 ![Alt Text](https://github.com/zhus-dika/sloshing_balance_via_roboarm/blob/main/rlKinova_marsRover_fluent_via_files/data/output/kinovaBallBalanceAgent_with_mars_rover_act2_act3_act6_act7/ansys-isosurface%2Brl-kinova_16x.gif)
 
+### 🐠 Useful bash cmds
+Allocate additional swap
+
+```sudo fallocate -l 4G /swapfile2```
+
+```sudo chmod 600 /swapfile2```
+
+```sudo mkswap /swapfile2```
+
+```sudo swapon /swapfile2```
