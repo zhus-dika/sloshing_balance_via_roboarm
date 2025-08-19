@@ -11,7 +11,7 @@
 ### 🐱 SIMULINK
 - Open project file `rlKinovaBallBalance.prj`
 - For 3d visualisation, change `Visualisation` option from `None` to `3D Mesh`
-- Run `TrainSACAgentForBallBalanceControlExample.mlx` script
+- Run `TrainSACAgentForVesselWithFluidControlExample.mlx` script
 
 
   **Main physical scheme**
@@ -27,11 +27,11 @@
     ```
     __NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia fluent
     ```
-- Read case file [glass_liquid_sloshing_simulink/setup_vessel_3.5x6.0x100_res-4.cas.h5](glass_liquid_sloshing_simulink/setup_vessel_3.5x6.0x100_res-4.cas.h5)
+- Read case file [glass_liquid_sloshing_simulink/vessel-res-2/vessel_3.5x6.0x100_res-2.cas.h5](glass_liquid_sloshing_simulink/vessel-res-2/vessel_3.5x6.0x100_res-2.cas.h5)
 - Set the number of MPI processes, for example, for 4 cores is 4
-- Build & load udf file [glass_liquid_sloshing_simulink/io_fluent-simulink_udf_final.c](glass_liquid_sloshing_simulink/io_fluent-simulink_udf_final.c)
+- Build & load udf file [glass_liquid_sloshing_simulink/vessel-res-2/io_fluent-simulink_udf_vessel-res-2.c](glass_liquid_sloshing_simulink/vessel-res-2/io_fluent-simulink_udf_vessel-res-2.c)
 - Activate function hooks
-- Read a scheme via GUI *File → Read → Scheme* [glass_liquid_sloshing_simulink/reset/reset_flag.scm](glass_liquid_sloshing_simulink/reset/reset_flag.scm)
+- Read a scheme via GUI *File → Read → Scheme* [glass_liquid_sloshing_simulink/vessel-res-2/reset/reset_flag_vessel-res-2.scm](glass_liquid_sloshing_simulink/vessel-res-2/reset/reset_flag_vessel-res-2.scm)
 - Add cmd ```(reset-if-flag)``` in Execute Commands via GUI *Solution → Calculation Activities → Execute Commands*
   Details: Active — ✔︎, Execution Type → Execute Repeatedly, Every = 1
 
