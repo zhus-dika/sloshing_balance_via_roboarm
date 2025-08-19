@@ -30,40 +30,15 @@ R7_q0 = deg2rad(-90);
 gAngle0 = 35;
 
 % Max torque limit
-max_torque = 1.5;
+max_torque = [3.5700;    0.0300;   0.4200;    0.0270];
 
 robot_opacity = 1;
 
 % gravity
-g = 9.80665;
+g = 3.71;
 
-% Initial torques
-% to find initial torques when ball is at plate center, change the 
-% rev joints R6 and R7 to accept motion inputs R6_q0 and R7_q0 and sense 
-% the torques.
 %% -------- Гравитационная компенсация на старт позы --------------------
-% массы звеньев Gen3 (кг)
-% m2 = 0.206679;
-% m3 = 0.137977;     % локоть
-% m4 = 0.400000;     % «предпредплечье» (R6-звено)
-% 
-% % суммарная масса груза на плечевом и локтевом моторах
-% g  = 9.80665;                            % м/с²
-% mCup      = vessel.mass + vessel.mass_liquid;
-% 
-% m_eff_sh  = m2 + m3 + m4 + mCup;         % всё, что «висит» на R2
-% d_sh      = 0.20;                        % плечо до суммарного COM
-% shoulder_torque_0 = m_eff_sh * g * d_sh * sin(R2_q0);   % Н·м
-% 
-% m_eff_el  = m3 + m4 + mCup;              % всё, что «висит» на R3
-% d_el      = 0.12;                        % плечо до COM груза
-% elbow_torque_0    = m_eff_el * g * d_el * sin(R2_q0 + R3_q0);
-% 
-% % для запястья и ладони, если нет точных плеч ‒ оставим 0
-% wrist_torque_0 = 0;
-% hand_torque_0  = 0;
-
-U0 = [-1.05 0 -3.6216 0];
+U0 = [11.9 0.1 -1.4 0.09];
 
 %% -------- GLASS PLATE PARAMETERS --------
 
@@ -71,9 +46,6 @@ plate.length = 0.25;     % m, radius of plate
 plate.width  = 0.25;     % m, radius of plate
 plate.thickness = 0.005;                    % m, thicknes of plate
 plate.mass = 0.2;                        % m, mass of plate
-
-plate.linear_vel_limit = 4;
-plate.angle_vel_limit = 8;
 
 w = plate.width;
 h = plate.length;

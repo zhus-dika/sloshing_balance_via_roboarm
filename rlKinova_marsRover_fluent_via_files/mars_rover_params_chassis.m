@@ -234,7 +234,7 @@ Control.Drive.TrqCmdLimitPos =  500; % N*m
 Control.Drive.TrqCmdLimitNeg = -500; % N*m
 
 Control.Drive.TargetSpeed = 0.1; % m/s
-Control.Drive.TargetAccel = 0.5; % m/s^2
+Control.Drive.TargetAccel = 0.05; % m/s^2
 Control.Drive.StartTime = 1;     % roverStartTime
 
 

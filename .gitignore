@@ -22,6 +22,6 @@ glass_liquid_sloshing_simulink/vessel-res-7/libudf
 rlKinova_marsRover_fluent_via_files/data/work_dir
 rlKinova_marsRover_fluent_via_files/logs
 rlKinova_marsRover_fluent_via_files/savedSims
-rlKinova_marsRover_fluent_via_files/trained_agents/checkpoints
+rlKinova_marsRover_fluent_via_files/trained_agents
 
 .idea/
