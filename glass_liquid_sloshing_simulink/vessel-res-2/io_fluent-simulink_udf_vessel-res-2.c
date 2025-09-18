@@ -354,9 +354,9 @@ DEFINE_EXECUTE_AT_END(write_props_to_simulink)
     FILE *fp = fopen(feed_path, "w");
     if (fp) {
         fprintf(fp,
-            "%.6e %.6e "
-            "%.6e %.6e %.6e "
-            "%.6e %.6e %.6e %.6e %.6e %.6e "
+            "%.9e %.9e "
+            "%.9e %.9e %.9e "
+            "%.9e %.9e %.9e %.9e %.9e %.9e "
             "%.6e\n",
             CURRENT_TIME, m_tot,
             com[0], com[1], com[2],

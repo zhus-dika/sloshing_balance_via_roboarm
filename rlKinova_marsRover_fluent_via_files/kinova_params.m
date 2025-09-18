@@ -30,7 +30,9 @@ R7_q0 = deg2rad(-90);
 gAngle0 = 35;
 
 % Max torque limit
-max_torque = [3.5700;    0.0300;   0.4200;    0.0270];
+% max_torque = [0.0;    0.0;   0.0;    0.0];
+max_torque = [3.5;    0.1;   0.75;    0.5];
+% max_torque = [1.5;    0.05;   0.5;    0.05];
 
 robot_opacity = 1;
 
