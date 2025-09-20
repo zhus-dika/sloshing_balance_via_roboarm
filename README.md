@@ -104,7 +104,11 @@
                       [v1][pal]paletteuse=dither=bayer:bayer_scale=1:diff_mode=rectangle:new=1" \
      -loop 0 rover_slosh_time_100fps_hq.gif
    ```
+<<<<<<< Updated upstream
    ![Alt Text](https://github.com/zhus-dika/sloshing_balance_via_roboarm/blob/main/rlKinova_marsRover_fluent_via_files/data/output/rover-side_slosh_pip_time_100fps.gif)
+=======
+![Alt Text](https://github.com/zhus-dika/sloshing_balance_via_roboarm/blob/main/rlKinova_marsRover_fluent_via_files/data/output/animations/rover_slosh_time_100fps_hq.gif)
+>>>>>>> Stashed changes
 
    or in youtube https://youtu.be/L5km3YW9cCE
 ### 🐠 Useful bash commands

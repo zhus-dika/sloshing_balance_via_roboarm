@@ -27,3 +27,54 @@ watch -n5 free -h
 watch -n5 nvidia-smi
 # диск
 watch -n30 'df -h /home'
+
+# combine two video
+ffmpeg -i mars_rover+kinova_roboarm_liquid-sloshing_top.mp4 -i sloshing_100fps_14s.mp4 \
+  -filter_complex "\
+[0:v]scale=-2:1080,setsar=1[base]; \
+[1:v]scale=iw/2:-2,setsar=1,format=rgba,\
+drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:\
+text='Sloshing (Fluent)':x=10:y=10:fontsize=28:fontcolor=white:box=1:boxcolor=black@0.5,\
+pad=iw+8:ih+8:4:4:white[small]; \
+[base][small]overlay=20:20:shortest=1" \
+  -r 100 -c:v libx264 -pix_fmt yuv420p -crf 18 -preset medium -movflags +faststart \
+  rover_slosh_pip_left_100fps.mp4
+
+# with TIMER
+ffmpeg -i rover_100fps.mp4 -i sloshing_100fps.mp4 \
+  -filter_complex "\
+[0:v]scale=-2:1080,setsar=1[base]; \
+[1:v]scale=iw/2:-2,setsar=1,format=rgba,\
+drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:\
+text='Sloshing (Fluent)':x=10:y=10:fontsize=28:fontcolor=white:box=1:boxcolor=black@0.5,\
+pad=iw+8:ih+8:4:4:white[small]; \
+[base][small]overlay=20:20:shortest=1, \
+drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:\
+text='t=%{pts\\:hms}':x=w-tw-20:y=h-th-20:fontsize=32:fontcolor=white:box=1:boxcolor=black@0.4" \
+  -r 100 -c:v libx264 -pix_fmt yuv420p -crf 18 -preset medium -movflags +faststart \
+  rover_slosh_time_100fps.mp4
+  
+# high quality  
+ffmpeg -i rover_100fps.mp4 -i sloshing_100fps.mp4 \
+-filter_complex "\
+[0:v]scale=-2:1080:flags=lanczos,setsar=1[base]; \
+[1:v]scale=iw/2:-2:flags=lanczos,setsar=1,format=rgba,\
+drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:\
+text='Sloshing (Fluent)':x=10:y=10:fontsize=28:fontcolor=white:box=1:boxcolor=black@0.5,\
+pad=iw+8:ih+8:4:4:white[small]; \
+[base][small]overlay=20:20:shortest=1, \
+drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:\
+text='t=%{pts\\:hms}':x=w-tw-20:y=h-th-20:fontsize=32:fontcolor=white:box=1:boxcolor=black@0.4,\
+format=yuv420p" \
+-c:v libx264 -preset slow -crf 17 \
+-movflags +faststart \
+rover_slosh_time_100fps_hq.mp4
+
+
+# convert video2gif
+ffmpeg -i rover_slosh_time_100fps_hq.mp4 \
+  -filter_complex "[0:v]fps=30,scale=640:-1:flags=lanczos,split[v0][v1]; \
+                   [v0]palettegen=stats_mode=full[pal]; \
+                   [v1][pal]paletteuse=dither=bayer:bayer_scale=1:diff_mode=rectangle:new=1" \
+  -loop 0 rover_slosh_time_100fps_hq.gif
+

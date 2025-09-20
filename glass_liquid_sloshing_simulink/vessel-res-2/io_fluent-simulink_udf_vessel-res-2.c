@@ -26,8 +26,8 @@
 /* ------------------- настройки/пути ------------------------------ */
 /* Частота обмена (каждые SKIP шагов dtime) */
 #define SKIP              20     /* 20 × 0.0005 = 0.01 s */
-#define MAX_ATTEMPTS     100     /* ожидание pose.ok */
-#define WAIT_US      1000000     /* 1 с */
+#define MAX_ATTEMPTS     1000     /* ожидание pose.ok */
+#define WAIT_US      2000000     /* 1 с */
 
 #define DEFAULT_FLAG_IN    "/home/dika/Documents/sloshing_balance_via_roboarm/rlKinova_marsRover_fluent_via_files/data/work_dir/pose.ok"
 #define DEFAULT_POSE_IN    "/home/dika/Documents/sloshing_balance_via_roboarm/rlKinova_marsRover_fluent_via_files/data/work_dir/pose.dat"
