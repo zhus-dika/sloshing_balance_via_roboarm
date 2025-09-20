@@ -36,8 +36,23 @@
   Details: Active — ✔︎, Execution Type → Execute Repeatedly, Every = 1
 
 ### 🦏 Animation 
-with iso-surface
-  
+
+- Save video in Mechanics Explorer as MJPEG-AVI in Matlab
+    ```
+    mdl = 'rlKinovaSloshingBalance';
+    
+    smwritevideo(mdl,'rover_100fps.avi', ...
+     'VideoFormat','motion jpeg avi', ...
+     'FrameRate',100, ...
+     'FrameSize',[1920 1080], ...
+     'PlaybackSpeedRatio',1.0);
+    ```
+- Convert avi to mp4 in bash
+  ```
+  ffmpeg -i data/output/rover_100fps.avi \
+    -c:v libx264 -pix_fmt yuv420p -crf 18 -preset medium -r 100 -movflags +faststart \
+    data/output/rover_100fps.mp4
+  ```
 ![Alt Text](https://github.com/zhus-dika/sloshing_balance_via_roboarm/blob/main/rlKinova_marsRover_fluent_via_files/data/output/rover-side_slosh_pip_time_100fps.gif)
 
 ### 🐠 Useful bash cmds
