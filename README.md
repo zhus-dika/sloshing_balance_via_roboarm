@@ -51,7 +51,7 @@
    - Convert avi to mp4 in bash
      ```
      ffmpeg -i data/output/rover_100fps.avi \
-       -c:v libx264 -pix_fmt yuv420p -crf 18 -preset medium -r 100 -movflags +faststart \
+       -c:v libx264 -pix_fmt yuv420p -crf 16 -preset medium -r 100 -movflags +faststart \
        data/output/rover_100fps.mp4
      ```
 2. 🦡 Save video with vessel
