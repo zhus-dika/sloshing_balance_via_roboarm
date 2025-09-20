@@ -37,25 +37,51 @@
 
 ### 🦏 Animation 
 
-- Save video in Mechanics Explorer as MJPEG-AVI in Matlab
-    ```
-    mdl = 'rlKinovaSloshingBalance';
-    
-    smwritevideo(mdl,'rover_100fps.avi', ...
-     'VideoFormat','motion jpeg avi', ...
-     'FrameRate',100, ...
-     'FrameSize',[1920 1080], ...
-     'PlaybackSpeedRatio',1.0);
-    ```
-- Convert avi to mp4 in bash
-  ```
-  ffmpeg -i data/output/rover_100fps.avi \
-    -c:v libx264 -pix_fmt yuv420p -crf 18 -preset medium -r 100 -movflags +faststart \
-    data/output/rover_100fps.mp4
-  ```
+1. 🦩 Save video with rover
+   - in Mechanics Explorer as MJPEG-AVI (SIMULINK)
+     ```
+     mdl = 'rlKinovaSloshingBalance';
+     
+     smwritevideo(mdl,'rover_100fps.avi', ...
+      'VideoFormat','motion jpeg avi', ...
+      'FrameRate',100, ...
+      'FrameSize',[1920 1080], ...
+      'PlaybackSpeedRatio',1.0);
+     ```
+   - Convert avi to mp4 in bash
+     ```
+     ffmpeg -i data/output/rover_100fps.avi \
+       -c:v libx264 -pix_fmt yuv420p -crf 18 -preset medium -r 100 -movflags +faststart \
+       data/output/rover_100fps.mp4
+     ```
+2. 🦡 Save video with vessel
+   - Save simulation frames in FLUENT
+
+     *Solution* &rarr; *Activities* &rarr; *Create* &rarr; *Solution Animations*
+
+   - Combine png files to video in bash
+     ```
+     ffmpeg -framerate 100 -start_number 0 -i sloshing_balance_via_roboarm/glass_liquid_sloshing_simulink/animation-2_%04d.png   -vf "pad=iw+mod(iw\,2):ih+mod(ih\,2):color=white"   -c:v libx264 -pix_fmt yuv420p -crf 18 -preset medium -movflags +faststart   sloshing_balance_via_roboarm/glass_liquid_sloshing_simulink/sloshing_100fps.mp4
+     ```
+3. 🦆 Combine 2 videos in bash
+   ```
+   # with TIMER
+   ffmpeg -i mars_rover+kinova_roboarm_liquid-sloshing_top.mp4 -i sloshing_100fps.mp4 \
+     -filter_complex "\
+   [0:v]scale=-2:1080,setsar=1[base]; \
+   [1:v]scale=iw/2:-2,setsar=1,format=rgba,\
+   drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:\
+   text='Sloshing (Fluent)':x=10:y=10:fontsize=28:fontcolor=white:box=1:boxcolor=black@0.5,\
+   pad=iw+8:ih+8:4:4:white[small]; \
+   [base][small]overlay=20:20:shortest=1, \
+   drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:\
+   text='t=%{pts\\:hms}':x=w-tw-20:y=h-th-20:fontsize=32:fontcolor=white:box=1:boxcolor=black@0.4" \
+     -r 100 -c:v libx264 -pix_fmt yuv420p -crf 18 -preset medium -movflags +faststart \
+     rover_slosh_pip_left_time_100fps.mp4
+   ```
 ![Alt Text](https://github.com/zhus-dika/sloshing_balance_via_roboarm/blob/main/rlKinova_marsRover_fluent_via_files/data/output/rover-side_slosh_pip_time_100fps.gif)
 
-### 🐠 Useful bash cmds
+### 🐠 Useful bash commands
 Allocate additional swap
 
 ```sudo fallocate -l 4G /swapfile2```
