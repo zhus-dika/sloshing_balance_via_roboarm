@@ -12,11 +12,6 @@
 - Open project file `rlKinovaBallBalance.prj`
 - For 3d visualisation, change `Visualisation` option from `None` to `3D Mesh`
 - Run `TrainSACAgentForVesselWithFluidControlExample.mlx` script
-
-
-  **Main physical scheme**
-![alt text](https://github.com/zhus-dika/sloshing_balance_via_roboarm/blob/main/rlKinova_marsRover_fluent_via_files/images/main_scheme.png)
-
 ### 🐌 FLUENT
 - Run ansys server in bash
     ```
@@ -34,13 +29,78 @@
 - Read a scheme via GUI *File → Read → Scheme* [glass_liquid_sloshing_simulink/vessel-res-2/reset/reset_flag_vessel-res-2.scm](glass_liquid_sloshing_simulink/vessel-res-2/reset/reset_flag_vessel-res-2.scm)
 - Add cmd ```(reset-if-flag)``` in Execute Commands via GUI *Solution → Calculation Activities → Execute Commands*
   Details: Active — ✔︎, Execution Type → Execute Repeatedly, Every = 1
+  
+## 🦤 About observation & reward
+### 🦋 Observations are:
+ 1. positions (sine & cosine of joint angles) & velocities (joint angle deravatives) of the 4 actuated joints {1-12}
+ 2. volume of spills related to m_0 {13}
+ 3. COM of the liquid from FLUENT {14-16}
+ 4. dCOM velocity {17-19}
+ 5. normal vector of the GVM block {20-22} 
+ 6. lambda parameter (m_liquid/m_0) {23}
+ 7.angular & linear velocities (related to platform) of the GVM block {24-29}
+ 8. rover's acceleration related to GVM local system a_GVM_loc=quatToR_W2vessel{qPlate}(Mars_gravity-a_chassis) {30-32}
+### 🐡 Rewards are:
+ 1. Penalty for the agent for spills:
+    ``r_vol_spill = -4*vol_spill/vol_spill_max``
+ 
+ 2. Penalty for control effort:
+    ` r_action = -0.025*(T2^2+T3^2+T6^2+T7^2) `
+ 
+ 3. Penalty for agressive control effort:
+    `r_aggressive_action = -0.01*(dT2^2+dT3^2+dT6^2+dT7^2)`
+ 
+ 4. Penalty for COM velocity:
+    `rd_COM = -0.5*(dCOM_x^2+dCOM_y^2+dCOM_z^2)`
+ 
+ 6. Reward for difference COM from COM_target:
+    `r_diff_COM = exp[-2000*{(COM_x-COM_target_x)^2+(COM_y-COM_target_y)^2+(COM_z-COM_target_z)^2}]`
+ 
+ 8. Liquid-Retention–Weighted Reward:
+    
+    `lambda = max(0, m_liquid / m0);`
+ 
+    `reward=lambda^3*r_diff_COM+(1+3*(1-lambda)^3)* (r_vol_spill+r_action+r_agressive_action+rd_COM).`
+   
+  **Main physical scheme**
+ ![alt text](https://github.com/zhus-dika/sloshing_balance_via_roboarm/blob/main/rlKinova_marsRover_fluent_via_files/images/main_scheme.png)
+## 🐛 About agent training
+### 🐑 Randomization path
+ In each episode, a random path is selected from the 28 available paths.
+ ![alt text](https://github.com/zhus-dika/sloshing_balance_via_roboarm/blob/main/rlKinova_marsRover_fluent_via_files/images/rover_paths.png)
+### 🦞 Randomization of the rover's velocity and acceleration
+ The rover’s velocity and acceleration are randomized in each episode: the target speed is sampled from the interval 0.10–0.25 m/s, and the acceleration from 0.05–0.11 m/s².
+### 🐀 Randomization of the episode start time
+ In each episode, the onset of RL control is randomized: the agent starts interacting with the environment after a random delay 
+`t_start∼U(0,17s)` from the beginning of the simulation.
 
-### 🦏 Animation 
+To ensure stable and physically consistent behavior, we use an in-house PID controller in the Simulink model setup:
+
+**PD controller for joint warm-up**
+
+ For each controlled joint (R2, R3, R6, R7) we use a simple ***PD controller*** during the ***warm-up phase*** (before `rlStartTime`).  
+ The goal is to keep the arm near a desired configuration and avoid large transients while the rover settles on the terrain.
+ 
+ The holding torque is computed as:
+ 
+ `tau_{hold} = K_p (q_{ref} - q) - K_d * q'`
+ 
+ where:
+ 
+ - `q_{ref}` — desired joint angle (initial pose)  
+ - `q` — measured joint angle  
+ - `q'` — measured joint angular velocity  
+ - `K_p, K_d` — proportional and derivative gains  
+ 
+ The resulting torque `tau_{hold}` is saturated and applied to the joint ***instead of*** the RL agent action while `t < rlStartTime`.
+
+ When `t >= rlStartTime`, a Simulink `Switch` block routes the torque command from the RL agent, effectively disabling the PD controller during the learning/control phase.
+## 🦏 Make animation 
 
 1. 🦩 Save video with rover
    - in Mechanics Explorer as MJPEG-AVI (SIMULINK)
      ```
-     mdl = 'rlKinovaSloshingBalance';
+     mdl = 'rlKinovaBallBalance';
      
      smwritevideo(mdl,'rover_100fps.avi', ...
       'VideoFormat','motion jpeg avi', ...
