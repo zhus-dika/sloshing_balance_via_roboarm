@@ -17,7 +17,7 @@
     ```
     ~/Documents/ansys_inc/shared_files/licensing/start_lmcenter
     ```
-- Start license manager & open http://localhost:1084/ in web browser & put button **start**
+- Start license manager & open http://localhost:1084/ in web browser & put button START
 - Run Fluent
     ```
     __NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia fluent
@@ -67,7 +67,7 @@
 ## 🐛 About agent training
 ### 🐑 Randomization path
  In each episode, a random path is selected from the 28 available paths.
- ![alt text](https://github.com/zhus-dika/sloshing_balance_via_roboarm/blob/main/rlKinova_marsRover_fluent_via_files/images/rover_paths.png)
+ <img src="https://github.com/zhus-dika/sloshing_balance_via_roboarm/blob/main/rlKinova_marsRover_fluent_via_files/images/rover_paths.png" width="600">
 ### 🦞 Randomization of the rover's velocity and acceleration
  The rover’s velocity and acceleration are randomized in each episode: the target speed is sampled from the interval 0.10–0.25 m/s, and the acceleration from 0.05–0.11 m/s².
 ### 🐀 Randomization of the episode start time
@@ -78,7 +78,7 @@ To ensure stable and physically consistent behavior, we use an in-house PID cont
 
 **PD controller for joint warm-up**
 
- For each controlled joint (R2, R3, R6, R7) we use a simple ***PD controller*** during the ***warm-up phase*** (before `rlStartTime`).  
+ For each controlled joint (R2, R3, R6, R7) we use a simple PD controller during the warm-up phase (before `rlStartTime`).  
  The goal is to keep the arm near a desired configuration and avoid large transients while the rover settles on the terrain.
  
  The holding torque is computed as:
@@ -92,7 +92,7 @@ To ensure stable and physically consistent behavior, we use an in-house PID cont
  - `q'` — measured joint angular velocity  
  - `K_p, K_d` — proportional and derivative gains  
  
- The resulting torque `tau_{hold}` is saturated and applied to the joint ***instead of*** the RL agent action while `t < rlStartTime`.
+ The resulting torque `tau_{hold}` is saturated and applied to the joint instead of the RL agent action while `t < rlStartTime`.
 
  When `t >= rlStartTime`, a Simulink `Switch` block routes the torque command from the RL agent, effectively disabling the PD controller during the learning/control phase.
 ## 🦏 Make animation 
