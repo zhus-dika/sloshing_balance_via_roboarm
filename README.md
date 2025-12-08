@@ -22,12 +22,15 @@
     ```
     __NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia fluent
     ```
-- Read case file [glass_liquid_sloshing_simulink/vessel-res-2/vessel_3.5x6.0x100_res-2.cas.h5](glass_liquid_sloshing_simulink/vessel-res-2/vessel_3.5x6.0x100_res-2.cas.h5)
+- Read case&data file [glass_liquid_sloshing_simulink/vessel-res-2/vessel_3.5x6.0x100_res-2.cas.h5](glass_liquid_sloshing_simulink/vessel-res-2/vessel_3.5x6.0x100_res-2.cas.h5)
 - Set the number of MPI processes, for example, for 4 cores is 4
 - Build & load udf file [glass_liquid_sloshing_simulink/vessel-res-2/io_fluent-simulink_udf_vessel-res-2.c](glass_liquid_sloshing_simulink/vessel-res-2/io_fluent-simulink_udf_vessel-res-2.c)
 - Activate function hooks
 - Read a scheme via GUI *File → Read → Scheme* [glass_liquid_sloshing_simulink/vessel-res-2/reset/reset_flag_vessel-res-2.scm](glass_liquid_sloshing_simulink/vessel-res-2/reset/reset_flag_vessel-res-2.scm)
-- Add cmd ```(reset-if-flag)``` in Execute Commands via GUI *Solution → Calculation Activities → Execute Commands*
+- Add cmd ```(reset-if-flag)``` in Execute Commands via GUI
+
+  *Solution → Calculation Activities → Execute Commands*
+
   Details: Active — ✔︎, Execution Type → Execute Repeatedly, Every = 1
   
 ## 🦤 About observation & reward
@@ -38,8 +41,8 @@
  4. dCOM velocity {17-19}
  5. normal vector of the GVM block {20-22} 
  6. lambda parameter (m_liquid/m_0) {23}
- 7.angular & linear velocities (related to platform) of the GVM block {24-29}
- 8. rover's acceleration related to GVM local system a_GVM_loc=quatToR_W2vessel{qPlate}(Mars_gravity-a_chassis) {30-32}
+ 7. angular & linear velocities (related to platform) of the GVM block {24-29}
+ 8. rover's acceleration related to GVM local system a_GVM_loc=quatToR_W2vessel{qPlate}(Mars_gravity-a_GVM) {30-32}
 ### 🐡 Rewards are:
  1. Penalty for the agent for spills:
     ``r_vol_spill = -4*vol_spill/vol_spill_max``
@@ -69,12 +72,12 @@
  In each episode, a random path is selected from the 28 available paths.
  <img src="https://github.com/zhus-dika/sloshing_balance_via_roboarm/blob/main/rlKinova_marsRover_fluent_via_files/images/rover_paths.png" width="600">
 ### 🦞 Randomization of the rover's velocity and acceleration
- The rover’s velocity and acceleration are randomized in each episode: the target speed is sampled from the interval 0.10–0.25 m/s, and the acceleration from 0.05–0.11 m/s².
+ The rover’s velocity and acceleration are randomized in each episode: the target speed is sampled from the interval `v_rover∼U(0.10, 0.25)[m/s]`, and the acceleration from `a_rover∼U(0.05, 0.11)[m/s²]`.
 ### 🐀 Randomization of the episode start time
  In each episode, the onset of RL control is randomized: the agent starts interacting with the environment after a random delay 
-`t_start∼U(0,17s)` from the beginning of the simulation.
+`t_{start}∼U(0.5, 17)[s]` from the beginning of the simulation.
 
-To ensure stable and physically consistent behavior, we use an in-house PID controller in the Simulink model setup:
+To ensure stable and physically consistent behavior, we use an in-house PD controller in the Simulink model setup:
 
 **PD controller for joint warm-up**
 
@@ -83,16 +86,16 @@ To ensure stable and physically consistent behavior, we use an in-house PID cont
  
  The holding torque is computed as:
  
- `tau_{hold} = K_p (q_{ref} - q) - K_d * q'`
+ `tau_hold = K_p (q_ref - q) - K_d * q'`
  
  where:
  
- - `q_{ref}` — desired joint angle (initial pose)  
+ - `q_ref` — desired joint angle (initial pose)  
  - `q` — measured joint angle  
  - `q'` — measured joint angular velocity  
  - `K_p, K_d` — proportional and derivative gains  
  
- The resulting torque `tau_{hold}` is saturated and applied to the joint instead of the RL agent action while `t < rlStartTime`.
+ The resulting torque `tau_hold` is saturated and applied to the joint instead of the RL agent action while `t < rlStartTime`.
 
  When `t >= rlStartTime`, a Simulink `Switch` block routes the torque command from the RL agent, effectively disabling the PD controller during the learning/control phase.
 ## 🦏 Make animation 
