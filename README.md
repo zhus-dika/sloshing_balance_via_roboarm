@@ -1,3 +1,5 @@
+## 🦎 Motivation
+This project focuses on active sloshing control for planetary rover operations. A partially filled vessel is mounted on a rover and equipped with a Kinova Gen3 robotic arm that serves as an active damper for the moving liquid. Using Simscape Multibody–Fluent co-simulation, we model the interaction between the rover dynamics, the arm motion, and the free-surface liquid under reduced-gravity conditions (e.g., Mars). A reinforcement learning controller (SAC) is trained to generate arm motions that attenuate sloshing, limit spills, and stabilize the liquid center of mass while the rover follows randomized paths.
 ## 🐠 Software
 
 - Matlab R2024a
@@ -35,7 +37,7 @@
   
 ## 🦤 About observation & reward
 ### 🦋 Observations are:
- 1. positions (sine & cosine of joint angles) & velocities (joint angle deravatives) of the 4 actuated joints {1-12}
+ 1. positions (sine & cosine of joint angles) & velocities (joint angle derivatives) of the 4 actuated joints {1-12}
  2. volume of spills related to m_0 {13}
  3. COM of the liquid from FLUENT {14-16}
  4. dCOM velocity {17-19}
@@ -50,7 +52,7 @@
  2. Penalty for control effort:
     ` r_action = -0.025*(T2^2+T3^2+T6^2+T7^2) `
  
- 3. Penalty for agressive control effort:
+ 3. Penalty for aggressive control effort:
     `r_aggressive_action = -0.01*(dT2^2+dT3^2+dT6^2+dT7^2)`
  
  4. Penalty for COM velocity:
@@ -61,7 +63,7 @@
  
  8. Liquid-Retention–Weighted Reward:
     
-    `lambda = max(0, m_liquid / m0);`
+    `lambda = max(0, m_liquid / m_0);`
  
     `reward=lambda^3*r_diff_COM+(1+3*(1-lambda)^3)* (r_vol_spill+r_action+r_agressive_action+rd_COM).`
    
@@ -170,12 +172,6 @@ To ensure stable and physically consistent behavior, we use an in-house PD contr
    ![Alt Text](https://github.com/zhus-dika/sloshing_balance_via_roboarm/blob/main/rlKinova_marsRover_fluent_via_files/data/output/animations/rover_slosh_time_100fps_hq.gif)
    
    or in youtube https://youtu.be/L5km3YW9cCE
-### 🐠 Useful bash commands
-Allocate additional swap
-
-```sudo fallocate -l 4G /swapfile2```
-
-```sudo chmod 600 /swapfile2```
 
 ```sudo mkswap /swapfile2```
 
