@@ -172,7 +172,15 @@ To ensure stable and physically consistent behavior, we use an in-house PD contr
    ![Alt Text](https://github.com/zhus-dika/sloshing_balance_via_roboarm/blob/main/rlKinova_marsRover_fluent_via_files/data/output/animations/rover_slosh_time_100fps_hq.gif)
    
    or in youtube https://youtu.be/L5km3YW9cCE
+## 🐌 Repository structure
 
-```sudo mkswap /swapfile2```
-
-```sudo swapon /swapfile2```
+- `glass_liquid_sloshing_simulink/`
+  - VOF case model of the liquid sloshing in the vessel (`vessel-res-2/vessel_3.5x6.0x100_res-2.cas.h5`)
+  - UDF (`vessel-res-2/io_fluent-simulink_udf_vessel-res-2.c`)
+  - Reset script (`vessel-res-2/reset/reset_flag_vessel-res-2.scm`)
+- `rlKinova_marsRover_fluent_via_files/` 
+  - File-based handshake between Simulink and Fluent
+  - Simulink/Simscape models of the rover, Kinova arm `rlKinovaBallBalance.slx`
+  - RL environment blocks, reward and observation computation
+- `data/`
+  - Output videos, logs, etc.
