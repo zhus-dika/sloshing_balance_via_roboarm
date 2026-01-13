@@ -5,7 +5,7 @@
 
 % --------  время старта RL-агента -------- 
 rlStartTime = 0;
-rlEpisodeFinalTime = 60;
+rlEpisodeFinalTime = 30;
 
 %% -------- KINOVA ARM PARAMETERS --------
 
