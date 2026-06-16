@@ -1,1 +1,0 @@
-ffmpeg -framerate 100 -start_number 0 -i animation-2_%04d.png   -vf "pad=iw+mod(iw\,2):ih+mod(ih\,2):color=white"   -c:v libx264 -pix_fmt yuv420p -crf 18 -preset medium -movflags +faststart   sloshing_100fps.mp4

@@ -5,6 +5,7 @@
 
 % --------  время старта RL-агента -------- 
 rlStartTime = 0;
+rlTimeStep = 0.01;
 rlEpisodeFinalTime = 21;
 
 %% -------- KINOVA ARM PARAMETERS --------
@@ -26,8 +27,8 @@ gAngle0 = 35;
 % max_torque = [3.5;    0.1;   0.75;    0.5];
 % max_torque = [3.0; 0.5; 1.0; 0.3]; agent 6.1-6.7
 % max_torque = [2.0; 1.0; 0.75; 0.75];
-max_torque = [1.6; 1.2; 0.9; 0.6];   % [J2 J3 J6 J7] Н·м
-max_torque_PD = [2.0; 1.0; 0.6; 0.5]; 
+max_torque = [1.6; 0.6; 0.9; 0.5];   % [J2 J3 J6 J7] Н·м
+max_torque_PD = [2.0; 0.6; 0.6; 0.3]; 
 robot_opacity = 1;
 max_angular_vel = 20;
 max_linear_vel = 10;
@@ -39,6 +40,7 @@ g = 3.71;
 % U0 = [11.9 0.1 -1.4 0.09];
 % U0 = [11.80, 0.07, -1.24, -0.66]; % log median, N*m
 U0 = [11.98, 0.10, -1.22, -0.005]; % log mean
+abs_max_torque_U = [13.98, 0.70, 2.12, 0.505];
 %% -------- GLASS PLATE PARAMETERS --------
 
 plate.length = 0.25;     % m, radius of plate
