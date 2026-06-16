@@ -1,0 +1,45 @@
+### zoom out in fluent tank model to use active window
+### combine png files to video in bash
+ffmpeg -framerate 100 -start_number 0 -i animation-scaled_%04d.png   -vf "pad=iw+mod(iw\,2):ih+mod(ih\,2):color=white"   -c:v libx264 -pix_fmt yuv420p -crf 18 -preset medium -movflags +faststart   sloshing_100fps.mp4
+
+
+###convert avi to mp4 in bash
+ffmpeg -i rover_100fps.avi \
+  -c:v libx264 -pix_fmt yuv420p -crf 16 -preset medium -r 100 -movflags +faststart \
+  rover_100fps.mp4
+
+
+###split 2 videos with normal speed
+ffmpeg -i rover_100fps.mp4 -i sloshing_100fps.mp4 \
+-filter_complex "\
+[0:v]scale=-2:1080:flags=lanczos,setsar=1[base]; \
+[1:v]scale=iw/3:-2:flags=lanczos,setsar=1,format=rgba,\
+drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:\
+text='Sloshing (Fluent)':x=10:y=10:fontsize=22:fontcolor=white:box=1:boxcolor=black@0.5,\
+pad=iw+8:ih+8:4:4:white[small]; \
+[base][small]overlay=20:20:shortest=1, \
+drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:\
+text='t=%{pts\\:hms}':x=w-tw-20:y=h-th-20:fontsize=32:fontcolor=white:box=1:boxcolor=black@0.4,\
+format=yuv420p" \
+-c:v libx264 -preset slow -crf 17 \
+-movflags +faststart \
+rover_slosh_time_100fps_hq.mp4
+
+
+
+###split 2 videos with 0.25x speed
+ffmpeg -i rover_100fps.mp4 -i sloshing_100fps.mp4 \
+-filter_complex "\
+[0:v]scale=-2:1080:flags=lanczos,setsar=1[base]; \
+[1:v]scale=480:-2:flags=lanczos,setsar=1,format=rgba,\
+drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:\
+text='Sloshing (Fluent)':x=10:y=10:fontsize=22:fontcolor=white:box=1:boxcolor=black@0.5,\
+pad=iw+8:ih+8:4:4:white[small]; \
+[base][small]overlay=20:20:shortest=1, \
+drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:\
+text='t=%{pts\\:hms}':x=w-tw-20:y=h-th-20:fontsize=32:fontcolor=white:box=1:boxcolor=black@0.4,\
+setpts=4*PTS,format=yuv420p" \
+-c:v libx264 -preset slow -crf 17 \
+-movflags +faststart \
+-an \
+rover_slosh_time_100fps_hq_slow4x.mp4
