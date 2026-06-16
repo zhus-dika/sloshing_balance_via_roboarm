@@ -38,34 +38,40 @@ This project focuses on active sloshing control for planetary rover operations. 
 ## 🦤 About observation & reward
 ### 🦋 Observations are:
  1. positions (sine & cosine of joint angles) & velocities (joint angle derivatives) of the 4 actuated joints {1-12}
- 2. volume of spills related to m_0 {13}
+ 2. volume of spills related to m_liquid_0 {13}
  3. COM of the liquid from FLUENT {14-16}
  4. dCOM velocity {17-19}
  5. normal vector of the GVM block {20-22} 
- 6. lambda parameter (m_liquid/m_0) {23}
+ 6. lambda parameter (m_liquid/m_liquid_0) {23}
  7. angular & linear velocities (related to platform) of the GVM block {24-29}
  8. rover's acceleration related to GVM local system a_GVM_loc=quatToR_W2vessel{qPlate}(Mars_gravity-a_GVM) {30-32}
+ 9. c_align = a_GVM / (||a_GVM||+epsilon)*dot*n_plate {33}
+ 10. 1-step lag for torques: act_torque_prev {34-37}
+
 ### 🐡 Rewards are:
  1. Penalty for the agent for spills:
-    ``r_vol_spill = -4*vol_spill/vol_spill_max``
- 
- 2. Penalty for control effort:
-    ` r_action = -0.025*(T2^2+T3^2+T6^2+T7^2) `
- 
- 3. Penalty for aggressive control effort:
-    `r_aggressive_action = -0.01*(dT2^2+dT3^2+dT6^2+dT7^2)`
- 
- 4. Penalty for COM velocity:
-    `rd_COM = -0.5*(dCOM_x^2+dCOM_y^2+dCOM_z^2)`
- 
- 6. Reward for difference COM from COM_target:
-    `r_diff_COM = exp[-2000*{(COM_x-COM_target_x)^2+(COM_y-COM_target_y)^2+(COM_z-COM_target_z)^2}]`
- 
- 8. Liquid-Retention–Weighted Reward:
     
-    `lambda = max(0, m_liquid / m_0);`
+    ``r_vol_spill = -20*m_spill/m_liquid_0;``
  
-    `reward=lambda^3*r_diff_COM+(1+3*(1-lambda)^3)* (r_vol_spill+r_action+r_agressive_action+rd_COM).`
+ 3. Penalty for agressive control effort:
+    
+    `r_aggressive_action = -0.005*((U2-U2_prev)^2+(U3-U3_prev)^2+(U6-U6_prev)^2+(U7-U7_prev)^2);`
+ 
+ 5. Penalty for COM velocity:
+    
+    `rd_COM = -0.1*(dCOM_x^2+dCOM_y^2+dCOM_z^2);`
+ 
+ 7. Reward for difference COM from COM_target:
+    
+    `r_diff_COM = exp[-2000*{(COM_x-COM_target_x)^2+(COM_y-COM_target_y)^2+(COM_z-COM_target_z)^2}];`
+ 
+ 9. Reward for c_align:
+     
+    `r_c_align = -0.25 * c_align`
+ 
+ Full reward:
+ 
+    `reward = r_diff_COM + r_vol_spill + r_agressive_action + rd_COM + r_c_align.`
    
   **Main physical scheme**
  ![alt text](https://github.com/zhus-dika/sloshing_balance_via_roboarm/blob/main/rlKinova_marsRover_fluent_via_files/images/main_scheme.png)
@@ -169,9 +175,7 @@ To ensure stable and physically consistent behavior, we use an in-house PD contr
                       [v1][pal]paletteuse=dither=bayer:bayer_scale=1:diff_mode=rectangle:new=1" \
      -loop 0 rover_slosh_time_100fps_hq.gif
    ```
-   ![Alt Text](https://github.com/zhus-dika/sloshing_balance_via_roboarm/blob/main/rlKinova_marsRover_fluent_via_files/data/output/animations/rover_slosh_time_100fps_hq.gif)
-   
-   or in youtube https://youtu.be/L5km3YW9cCE
+   in youtube https://youtu.be/3Js5FcECwhM
 ## 🐌 Repository structure
 
 - `glass_liquid_sloshing_simulink/`
