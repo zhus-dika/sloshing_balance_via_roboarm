@@ -1,3 +1,6 @@
+# MATLAB trained RL agents / checkpoints
+rlKinova_marsRover_fluent_via_files/trained_agents/
+
 glass_liquid_sloshing_simulink/cleanup-*
 glass_liquid_sloshing_simulink/fluent-*
 glass_liquid_sloshing_simulink/libudf
