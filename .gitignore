@@ -29,13 +29,8 @@ rlKinova_marsRover_fluent_via_files/savedSims
 .idea/
 
 # Generated animation frames
-glass_liquid_sloshing_simulink/vessel-res-2/animations/pics/
+glass_liquid_sloshing_simulink/vessel-res-2/animations/
 rlKinova_marsRover_fluent_via_files/data/output/
-
-# MATLAB generated states/checkpoints
-envStreamState.mat
-rngState.mat
-*.mat
 
 # Videos
 *.mp4
