@@ -235,7 +235,7 @@ Control.Drive.TrqCmdLimitNeg = -500; % N*m
 
 Control.Drive.TargetSpeed = 0.1; % m/s
 Control.Drive.TargetAccel = 0.05; % m/s^2
-Control.Drive.StartTime = 0.5;     % roverStartTime
+Control.Drive.StartTime = 2.5;     % roverStartTime
 Control.Drive.MinSpeed = 0.1; % m/s
 Control.Drive.MaxSpeed = 0.21; % m/s
 
@@ -251,8 +251,8 @@ Control.Steer.TrqCmdLimitNeg = -500; % N*m
 
 
 %% Spatial Contact Force Block
-Rover.Wheel_Surface.Contact.k = 1e6/5;
-Rover.Wheel_Surface.Contact.d = 1e4;
+Rover.Wheel_Surface.Contact.k = 1e5;%1e6/5;
+Rover.Wheel_Surface.Contact.d = 1e3;%1e4;
 Rover.Wheel_Surface.Contact.trans_depth = 0.3;
 Rover.Wheel_Surface.Friction.mu_static = 0.8;
 Rover.Wheel_Surface.Friction.mu_dynamic = 0.6;
